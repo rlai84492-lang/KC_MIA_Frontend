@@ -19,7 +19,7 @@ const TITLES = {
 const ALL_PATHS_ONLY = ["audiences", "referrals", "visits"];
 
 export default function Topbar({ view, onNavigate }) {
-  const { filters, setFilters, refresh, loading, error, updatedAt, settled, service } = useDashboard();
+  const { filters, setFilters, refresh, loading, error, updatedAt, settled } = useDashboard();
   const toast = useToast();
   const manualRefresh = useRef(null); // `settled` value when Refresh was pressed
   const [title, subtitle] = TITLES[view];
@@ -68,13 +68,6 @@ export default function Topbar({ view, onNavigate }) {
             {updatedAt && <> · Updated {istTime(updatedAt)}</>}
           </div>
         </div>
-
-        {service.providerName === "mock" && (
-          <span className="whitespace-nowrap rounded-full bg-kc-goldSoft px-2.5 py-[5px] text-xs font-semibold text-kc-ink2"
-            title="Generated sample data. Set VITE_DASHBOARD_PROVIDER=api to show live campaign data.">
-            Sample data
-          </span>
-        )}
       </header>
 
       <nav className="flex gap-1 overflow-x-auto px-4 pb-2 lg:hidden" aria-label="Sections">

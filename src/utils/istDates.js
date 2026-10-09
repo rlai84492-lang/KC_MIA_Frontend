@@ -29,18 +29,3 @@ export function istDateRange(days, anchor = new Date()) {
   return { from: shiftIstDate(to, -(Number(days) - 1)), to };
 }
 
-// Inclusive IST day bounds as epoch milliseconds.
-export function istDayStart(ymd) {
-  return Date.parse(`${ymd}T00:00:00+05:30`);
-}
-
-export function istDayEnd(ymd) {
-  return Date.parse(`${ymd}T23:59:59.999+05:30`);
-}
-
-// Every IST date from `from` to `to`, inclusive.
-export function istDatesBetween(from, to) {
-  const out = [];
-  for (let d = from; d <= to; d = shiftIstDate(d, 1)) out.push(d);
-  return out;
-}

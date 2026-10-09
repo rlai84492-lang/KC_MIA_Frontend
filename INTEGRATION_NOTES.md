@@ -6,7 +6,7 @@ This file records every data-related change to the dashboard and explains how ea
 
 ## Going live with real data
 
-_Last updated: Change 9 (the dashboard now reads the developer's backend, `DashboardController`, with its exact endpoint, parameter and field names)._
+_Last updated: Change 11 (mock data removed: the dashboard reads only the developer's backend, `DashboardController`, with its exact endpoint, parameter and field names)._
 
 ### Overall flow
 
@@ -17,10 +17,11 @@ Karix WhatsApp API
    ▼
 Chatbot backend (Spring Boot, the developer's)
    • stores messages, sessions, button taps, leads and bookings in MySQL
-   • DashboardController serves the dashboard: base path /api/dashboard, port 8086 in development
+   • DashboardController serves the dashboard: base path /api/dashboard, port 8086 on the server
+   • Azure VM: https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com (nginx forwards /api/ to 127.0.0.1:8086)
    ▼
 Backend API endpoints (DASHBOARD_ENDPOINTS in dashboardContract.js)
-   Overview       /metric-cards · /outcomes · /flow-dropoff · /activity · /paths
+   Overview       /metric-cards · /outcomes · /flow-dropoff · /activity · /paths · /category-budget-picks
    Conversations  /conversations/summary · /conversations · /conversations/export
    Referral Leads /referral-leads/summary · /referral-leads · /referral-leads/export
    Store Visits   /store-visits/summary · /store-visits/bookings
@@ -31,19 +32,18 @@ Dashboard (this React app): reads every field exactly as the backend names it
 
 The Karix API key and webhook secret live **only on the backend**. They must never be put in this React app, because anything in the frontend can be read by anyone who opens the dashboard.
 
-### Switching from mock to real data
+### How the dashboard gets its data
 
-1. Every screen gets its data only through `dashboardService` (`src/services/dashboardService.js`). No screen imports `src/data/mockData.js`. Screens may import `src/data/campaignConfig.js`, which is flow configuration (labels, step order, colours, card text), not data.
-2. `dashboardService` has one method per backend endpoint (15 in all, `getCohortSegment(key, …)` covers the 8 cohort downloads). It delegates to a provider:
-   - `mockDashboardProvider.js`: sample data (default), returned in the backend's exact shapes.
-   - `apiDashboardProvider.js`: calls the backend. It always adds `range=custom`, so the backend uses the dashboard's `from` / `to`.
-3. `.env.local` (already created) holds the switch:
+1. Every screen gets its data only through `dashboardService` (`src/services/dashboardService.js`). Screens may import `src/data/campaignConfig.js`, which is flow configuration (labels, step order, colours, card text), not data. There is no sample data in the app.
+2. `dashboardService` has one method per backend endpoint (16 in all, `getCohortSegment(key, …)` covers the 8 cohort downloads). It calls `apiDashboardProvider.js`, which always adds `range=custom`, so the backend uses the dashboard's `from` / `to`.
+3. `.env.local` sets where requests go:
    ```env
-   VITE_DASHBOARD_PROVIDER=mock   # change to api once the backend allows the requests (see below)
-   VITE_API_BASE_URL=             # empty = same origin; in dev, Vite proxies /api to http://localhost:8086
+   VITE_API_BASE_URL=     # empty = same origin (/api/dashboard/...), so no CORS is needed
+   BACKEND_URL=https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com   # npm run dev forwards /api here
    ```
-   Restart `npm run dev` after changing it.
-4. Rule for every future change: a method added to `dashboardService` must exist in both providers, return the backend's exact field names, and be documented in `dashboardContract.js`.
+   In `npm run dev` the Network tab shows `http://localhost:5173/api/dashboard/...`; Vite forwards each request to `BACKEND_URL`. A response with `Server: nginx` came from the Azure VM. Restart `npm run dev` after changing `.env.local`.
+4. In production the built dashboard (`dist/`) should be served by the same nginx as the backend, so `/api/` stays same-origin and `VITE_API_BASE_URL` stays empty.
+5. Rule for every future change: a method added to `dashboardService` must exist in `apiDashboardProvider.js`, use the backend's exact field names, and be documented in `dashboardContract.js`.
 
 ### Dates and time zone
 
@@ -66,44 +66,44 @@ The Karix API key and webhook secret live **only on the backend**. They must nev
 - **When the backend fails:**
   - A request that takes more than **15 seconds** is cancelled (`REQUEST_TIMEOUT_MS` in `apiDashboardProvider.js`).
   - If a refresh fails, the last good data stays on screen with a "Couldn't refresh" banner and Retry. The dashboard keeps trying every 30 seconds.
-  - If a page has never loaded, it shows "Couldn't load this page" with a reason (e.g. 403, 503, unreachable) and **Retry now**.
-- **On mock data:** a **"Sample data"** label shows in the header, and the numbers change while the page is open. The label disappears when `VITE_DASHBOARD_PROVIDER=api`.
-- **Load on the backend:** each open dashboard makes a few requests every 30 seconds (2 for the sidebar plus 1–2 for the page), plus 1 every 15 seconds for the Overview feed. Tables are paged at 50 rows, so a page load stays small even with 500,000 customers; only "Download as CSV" asks for every matching row.
+  - If a page has never loaded, it shows "Couldn't load this page" with a reason (e.g. 403, 404, 503, unreachable) and **Retry now**.
+- **Load on the backend:** each open dashboard makes a few requests every 30 seconds (2 for the sidebar plus 1–3 for the page), plus 1 every 15 seconds for the Overview feed. Tables are paged at 50 rows, so a page load stays small even with 500,000 customers; only "Download as CSV" asks for every matching row.
 
-### Before switching to `api`: open items for the backend
+### Open items for the backend
 
-1. **403 on every request:** `SecurityConfig` blocks `/api/dashboard/**`. Add `.requestMatchers(HttpMethod.GET, "/api/dashboard/**").permitAll()` (import `org.springframework.http.HttpMethod`) or the agreed login rule. Until then, stay on `mock`.
-2. **Budget labels:** `BUDGET_LABELS` in `DashboardServiceImple.java` still has the old bands. They must be the new text exactly: "Less than 20,000", "20,000 - 50,000", "Above 50,000" (they show in the Conversations Budget column and the cohort downloads).
-3. **Category and budget counts:** no endpoint sends them yet, so the Overview "Categories Picked" and "Budget Chosen" panels say "Not available yet". When they are added, only `CATEGORY_COUNTS` / `BUDGET_COUNTS` at the top of `Overview.jsx` need changing.
+1. **Azure VM: the dashboard APIs are missing (blocking).** Checked 9 Oct 2026: nginx forwards `/api/` and security no longer blocks it, but every `/api/dashboard/...` request returns Spring's JSON 404 (`{"status":404,"error":"Not Found","path":"/api/dashboard/metric-cards"}`). The app answering on the VM has no `DashboardController` routes: an old build was deployed, nginx forwards to a different app/port, or the controller isn't loaded. The developer must deploy the build with `DashboardController` (including `/category-budget-picks`) and check that nginx `proxy_pass` points at it. Done when `https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com/api/dashboard/metric-cards?range=custom&from=2026-10-09&to=2026-10-09&flow=all` returns 200 with JSON.
+2. **Security:** keep `karvachauth.dashboard.open-for-testing=true` in the VM's configuration (earlier every request returned 403) until the agreed access rule is in place.
+3. **Budget labels:** `BUDGET_LABELS` in `DashboardServiceImple.java` uses "Less than ₹20,000", "₹20,000 – ₹50,000", "Above ₹50,000". They must be exactly "Less than 20,000", "20,000 - 50,000", "Above 50,000" (no ₹, plain hyphen). They show in the Overview "Budget Chosen" panel, the Conversations Budget column and the cohort downloads.
 4. **Activity Feed event id:** `/activity` has no event id; the feed tells events apart by `timestamp` + `summary`. An id would be more reliable.
 5. **Full phone numbers in exports:** `/conversations/export` and `/referral-leads/export` send full numbers. The dashboard masks them in the CSV, but masking them on the server would be safer. Cohort downloads follow `fullMobile` correctly; the controller's default for `fullMobile` should be `false`.
 6. **Referral leads timing:** the backend counts a referral lead when the consent is answered. The agreed rule was to count it when the details are shared.
 7. **"Download as CSV" size:** `scope=all` has no row limit. With 500,000 customers a very wide download can be large; a cap or a background export may be needed later.
 8. **Server time zone:** the server must stay in IST (see "Dates and time zone").
-9. **Karix credentials** stay on the backend. The dashboard only needs `VITE_API_BASE_URL`.
+9. **Karix credentials** stay on the backend. The dashboard only needs `VITE_API_BASE_URL` and, in development, `BACKEND_URL`.
+10. **CORS (only if `VITE_API_BASE_URL` is set to the Azure URL):** the backend must allow the dashboard's origin with credentials, because `apiDashboardProvider.js` sends `credentials: "include"`. Not needed while `VITE_API_BASE_URL` is empty.
 
 ### Field checklist
 
-The dashboard reads these exact names. The full shapes are in `dashboardContract.js`. "Mock" = `mockDashboardProvider.js` returns it today; "Backend" = the developer's endpoint returns it (code reviewed; to be confirmed once the 403 is fixed).
+The dashboard reads these exact names. The full shapes are in `dashboardContract.js`. "Backend" = the developer's endpoint returns it (code reviewed, and confirmed live through the ngrok backend before the move to Azure; `/category-budget-picks` is code-reviewed only). Every row still needs re-checking on Azure once open item 1 is fixed.
 
-| Endpoint | Fields the dashboard reads | Mock | Backend |
-|---|---|---|---|
-| `/metric-cards` | messagesSent, messagesPerDay, messagesDelivered, messagesFailed, deliveryRate, readReceipts, openRate, openerTaps, clickRate | ✅ | ✅ |
-| `/outcomes` | referralLeads, isharaSent, storeVisitsBooked, buyOnlineClicks → each { total, trend [{ date, count }] } | ✅ | ✅ |
-| `/flow-dropoff` | stages [{ step, label, count, pct }] | ✅ | ✅ |
-| `/paths` | paths [{ flow, openerTaps, share, isharaSent, husbandsReferred, buyOnlineClicks, wivesReferred, piecesShortlisted, keepMePosted, visitsBooked }] | ✅ | ✅ |
-| `/activity` | events [{ badge, summary, timestamp, minutesAgo }] | ✅ | ✅ (no event id) |
-| Overview categories / budgets | counts per category and budget | — | ⏳ not sent yet |
-| `/conversations/summary` | totalSessions, enteredDiscovery, carouselReached, isharaSent, visitsBooked | ✅ | ✅ |
-| `/conversations` | rows [{ sessionId, customerName, phone, flow, stepCode, stepLabel, status, categoryLabel, budgetLabel, lastActivity, minutesAgo }], showBudget, size, totalElements | ✅ | ✅ |
-| `/conversations/export` | columns, rows | ✅ | ✅ |
-| `/referral-leads/summary` | referralLeads, husbandsReferred, wivesReferred, consentGivenPct, canBeMessaged, isharaForwards, optInLeads { optedIn, pctOfSparkleOpenerTaps, sparkleOpenerTaps } | ✅ | ✅ |
-| `/referral-leads` | rows [{ leadId, referredBy, flow, pathLabel, capturedAt, minutesAgo, contactName, contactStep, relation, mobile, keyDateLabel, consentLabel }], size, totalElements | ✅ | ✅ |
-| `/referral-leads/export` | columns, rows | ✅ | ✅ |
-| `/store-visits/summary` | visitsBooked, bookingFormOpened, completedPct, mostPickedSlot { timeSlot, pctOfBookings } | ✅ | ✅ |
-| `/store-visits/bookings` | rows [{ bookingId, bookingRef, customerName, flow, storeName, slotLabel, reservedLabel, bookedAt, minutesAgo }], size, totalElements | ✅ | ✅ |
-| `/cohorts/summary` | engagedNotFinished, completedOrOptedIn, whereTheyStopped / completedOrOptedInSegments { total, segments [{ key, label, flows, priority, count }] } | ✅ | ✅ |
-| `/cohorts/<key>` | columns, rows (mobiles full or masked by `fullMobile`) | ✅ | ✅ |
+| Endpoint | Fields the dashboard reads | Backend |
+|---|---|---|
+| `/metric-cards` | messagesSent, messagesPerDay, messagesDelivered, messagesFailed, deliveryRate, readReceipts, openRate, openerTaps, clickRate | ✅ |
+| `/outcomes` | referralLeads, isharaSent, storeVisitsBooked, buyOnlineClicks → each { total, trend [{ date, count }] } | ✅ |
+| `/flow-dropoff` | stages [{ step, label, count, pct }] | ✅ |
+| `/paths` | paths [{ flow, openerTaps, share, isharaSent, husbandsReferred, buyOnlineClicks, wivesReferred, piecesShortlisted, keepMePosted, visitsBooked }] | ✅ |
+| `/activity` | events [{ badge, summary, timestamp, minutesAgo }] | ✅ (no event id) |
+| `/category-budget-picks` | categories { total, rows [{ key, label, customers, pct }] }, budgets { total, rows, applicable } | ✅ (code reviewed; budget label text, open item 3) |
+| `/conversations/summary` | totalSessions, enteredDiscovery, carouselReached, isharaSent, visitsBooked | ✅ |
+| `/conversations` | rows [{ sessionId, customerName, phone, flow, stepCode, stepLabel, status, categoryLabel, budgetLabel, lastActivity, minutesAgo }], showBudget, size, totalElements | ✅ |
+| `/conversations/export` | columns, rows | ✅ |
+| `/referral-leads/summary` | referralLeads, husbandsReferred, wivesReferred, consentGivenPct, canBeMessaged, isharaForwards, optInLeads { optedIn, pctOfSparkleOpenerTaps, sparkleOpenerTaps } | ✅ |
+| `/referral-leads` | rows [{ leadId, referredBy, flow, pathLabel, capturedAt, minutesAgo, contactName, contactStep, relation, mobile, keyDateLabel, consentLabel }], size, totalElements | ✅ |
+| `/referral-leads/export` | columns, rows | ✅ |
+| `/store-visits/summary` | visitsBooked, bookingFormOpened, completedPct, mostPickedSlot { timeSlot, pctOfBookings } | ✅ |
+| `/store-visits/bookings` | rows [{ bookingId, bookingRef, customerName, flow, storeName, slotLabel, reservedLabel, bookedAt, minutesAgo }], size, totalElements | ✅ |
+| `/cohorts/summary` | engagedNotFinished, completedOrOptedIn, whereTheyStopped / completedOrOptedInSegments { total, segments [{ key, label, flows, priority, count }] } | ✅ |
+| `/cohorts/<key>` | columns, rows (mobiles full or masked by `fullMobile`) | ✅ |
 
 ---
 
@@ -116,6 +116,8 @@ The dashboard reads these exact names. The full shapes are in `dashboardContract
 > - The generic steps (`currentStep`, `currentStepLabel`, `STEPS`) were removed.
 >
 > The current rules are in the Phase 1 entry and in `dashboardContract.js`.
+>
+> Change 11 removed the mock provider and the sample data. Older entries that mention `mockDashboardProvider.js`, `mockData.js`, `VITE_DASHBOARD_PROVIDER` or "Mock-only items" are kept as history.
 
 
 ### Change 1 — Fix the Referral Leads path filter
@@ -787,4 +789,62 @@ See "Before switching to `api`: open items for the backend" at the top of this f
 **Mock-only items**
 - Sample `optInLeads.optedOut` is `null`, and the sample "Clicked Buy Online" download has an empty SKU column.
 - The sample "Completed or Opted In" total adds up the 4 cards. The backend counts each customer once.
+
+---
+
+### Change 10 — Categories Picked / Budget Chosen from the backend; Azure backend; Conversations path chips hidden
+
+**What changed and why**
+- **Categories Picked / Budget Chosen:** the developer added `GET /api/dashboard/category-budget-picks`. The Overview panels now show its rows exactly as sent: `label`, `customers` and the ready-made `pct` for each option. Before this, the panels said "Not available yet". The Budget panel is hidden when the backend sends `budgets.applicable = false` ("I'm celebrating" has no budget step).
+- **Backend address:** `npm run dev` now forwards `/api` to `BACKEND_URL` in `.env.local`. This replaced the fixed `http://localhost:8086` and later the ngrok URL. It is now the Azure VM, `https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com`. `VITE_API_BASE_URL` stays empty, so the browser only calls its own address and no CORS is needed.
+- **Conversations:** the Path chips above the table were hidden (commented out in `Conversations.jsx`). The table still follows the path chosen at the top of the page.
+
+**Files touched**
+- `vite.config.js` (proxy target from `BACKEND_URL`), `.env.local`
+- `src/services/`: `dashboardContract.js` (`categoryBudgetPicks` endpoint and its documented shape), `apiDashboardProvider.js` and `dashboardService.js` (`getCategoryBudgetPicks`), `mockDashboardProvider.js` (same shape; removed in Change 11)
+- `src/pages/Overview.jsx` (loads `/category-budget-picks` with `/outcomes` and `/flow-dropoff`; new `Bars` rows), `src/pages/Conversations.jsx` (Path chips hidden; `PATHS` / `setFilters` no longer imported there)
+
+Lint and build pass. All path tabs were checked.
+
+**New data fields / service methods**
+- `getCategoryBudgetPicks(params)` → `{ categories: { total, rows }, budgets: { total, rows, applicable }, flow, range }`, row `{ key, label, customers, pct }`.
+
+**Contract update**
+`DASHBOARD_ENDPOINTS.categoryBudgetPicks` added and the response documented in `dashboardContract.js`.
+
+**Real data mapping**
+Category keys are the backend's codes (`PENDANTS`, `MIA_SUTRA` …); Mia Sutra is left out on "sparkle". Budget keys are `UNDER_20K`, `20_50K`, `ABOVE_50K`. The budget label text still needs the backend change in open item 3.
+
+---
+
+### Change 11 — Mock data removed
+
+**What changed and why**
+The dashboard now reads only the real backend. The mock provider, the sample data and the `VITE_DASHBOARD_PROVIDER` switch were removed, together with code that only the mock used. Pages did not change: they already called only `dashboardService`. If the backend is unreachable or returns an error, pages show "Couldn't load this page" with the reason and keep retrying.
+
+**Files touched**
+- Deleted: `src/services/mockDashboardProvider.js`, `src/data/mockData.js`, the `.gitkeep` files in `src/components/charts/` and `src/components/tables/`, and the empty `src/components/filters/` folder
+- `src/services/dashboardService.js`: always uses `apiDashboardProvider`; `providerName` removed
+- `src/components/layout/Topbar.jsx`: "Sample data" badge removed
+- Unused code removed:
+  - `campaignConfig.js`: `CATEGORY_EXCLUDED_ON`, `BUDGETS`, `BUTTONS`, `VISIT_DAYS`, `VISIT_SLOTS`, `REFERRAL_TYPES`
+  - `TableParts.jsx`: `StatusPill`
+  - `csv.js`: `copyText`
+  - `format.js`: `pct`, `fullPhone`
+  - `istDates.js`: `istDayStart`, `istDayEnd`, `istDatesBetween`
+- `dashboardContract.js` (comment), `.env.local` and `.env.example` (no `VITE_DASHBOARD_PROVIDER`; `.env.example` now shows `BACKEND_URL`), `README.md`, this file
+
+Lint and build pass. All 5 pages, on every path tab, were checked against a test backend serving the backend's exact shapes: 70 requests, all 200, no errors.
+
+**New data fields / service methods**
+None. `dashboardService` keeps its 16 methods.
+
+**Contract update**
+No endpoint or field changes. `FLOW_STEP_CODES` stays in `dashboardContract.js` as documentation of the backend's step codes.
+
+**Real data mapping**
+Unchanged. See "Open items for the backend" at the top of this file; item 1 (the Azure 404) blocks all live data.
+
+**Mock-only items**
+None any more. The "Mock-only items" notes in older entries describe the removed sample data.
 

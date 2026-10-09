@@ -35,10 +35,12 @@ npm run lint       # code checks (should report no problems)
 
 | Variable | Values | Meaning |
 |---|---|---|
-| `VITE_DASHBOARD_PROVIDER` | `mock` (default) or `api` | `mock` = built-in sample data, with a "Sample data" label in the header. `api` = real data from the backend. |
-| `VITE_API_BASE_URL` | empty or a URL | Where the backend is. Empty = same origin (`/api/dashboard/...`). In `npm run dev`, `/api` is proxied to `http://localhost:8086` (see `vite.config.js`). |
+| `VITE_API_BASE_URL` | empty (recommended) or a URL | Where the browser sends API requests. Empty = same address as the dashboard (`/api/dashboard/...`), so no CORS is needed. A full URL makes the browser call the backend directly, which needs CORS on the backend. |
+| `BACKEND_URL` | a URL | Only for `npm run dev`: Vite forwards `/api` to this backend (see `vite.config.js`). Currently the Azure VM, `https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com`. If it is not set, Vite uses `http://localhost:8086`. |
 
-Vite reads these when it starts, so restart `npm run dev` (or rebuild) after changing them. Before switching to `api`, see the open backend items in `INTEGRATION_NOTES.md`.
+Vite reads these when it starts, so restart `npm run dev` (or rebuild) after changing them. Open backend items are listed in `INTEGRATION_NOTES.md`.
+
+The dashboard has no sample data: it always reads the backend. If the backend is unreachable or returns an error, pages show "Couldn't load this page" with the reason and keep retrying every 30 seconds.
 
 **Never put the Karix API key or webhook secret in this app.** Anything in the frontend can be read by anyone who opens the dashboard. Karix credentials belong to the backend only.
 
@@ -46,16 +48,16 @@ Vite reads these when it starts, so restart `npm run dev` (or rebuild) after cha
 
 ```text
 Karix WhatsApp API ──webhooks──▶ chatbot backend (Spring Boot, MySQL)
-                                     │  DashboardController: /api/dashboard/* (port 8086 in development)
+                                     │  DashboardController: /api/dashboard/* (port 8086; Azure VM behind nginx)
                                      ▼
-pages ──▶ dashboardService ──▶ apiDashboardProvider   (VITE_DASHBOARD_PROVIDER=api)
-                          └──▶ mockDashboardProvider  (default, sample data)
+pages ──▶ dashboardService ──▶ apiDashboardProvider ──▶ /api/dashboard/*
+                                                      (npm run dev: Vite forwards /api to BACKEND_URL)
 ```
 
-- **Pages only use `dashboardService`.** It has one method per backend endpoint. Pages never import mock data, so switching provider needs no page changes.
-- **Exact backend names.** Pages send the backend's parameter names (`flow`, `from`, `to`, `search`, `step`, `show`, `page`, `fullMobile` …) and read the backend's field names as they come. The sample data returns the same shapes.
+- **Pages only use `dashboardService`.** It has one method per backend endpoint. Pages never call `fetch` themselves.
+- **Exact backend names.** Pages send the backend's parameter names (`flow`, `from`, `to`, `search`, `step`, `show`, `page`, `fullMobile` …) and read the backend's field names as they come.
 - **Every endpoint, parameter and field is documented** in `src/services/dashboardContract.js`.
-- **The going-live guide** is `INTEGRATION_NOTES.md`, starting with "Going live with real data". It lists the open backend items, how up to date the dashboard is, and the field checklist. Its change log records every change.
+- **The integration guide** is `INTEGRATION_NOTES.md`, starting with "Going live with real data". It lists the open backend items, how up to date the dashboard is, and the field checklist. Its change log records every change.
 
 ## Real-time behaviour
 
@@ -73,11 +75,11 @@ src/
   components/       layout (sidebar, top bar), common (cards, toast, tooltip, errors), tables, charts, overview feed
   context/          DashboardContext: filters, sidebar data, refresh / auto-refresh
   hooks/            usePolling, useDashboardQuery
-  services/         dashboardService, providers, dashboardContract (the API contract)
-  data/             campaignConfig (flow steps, labels, category codes, cohort card text), mockData (sample data)
+  services/         dashboardService, apiDashboardProvider (the HTTP calls), dashboardContract (the API contract)
+  data/             campaignConfig (flow steps, labels, category codes, cohort card text)
   utils/            IST dates, number / phone / percentage formatting, CSV, saved preferences
 ```
 
-The flow steps, labels, categories and budgets follow the chatbot flow script (v7: no budget question on "I'm celebrating"). Budgets: "Less than 20,000", "20,000 - 50,000", "Above 50,000".
+The flow steps, labels and categories follow the chatbot flow script (v7: no budget question on "I'm celebrating"). Budget labels come from the backend: "Less than 20,000", "20,000 - 50,000", "Above 50,000".
 
 **Naming:** the Cohorts page is called `audiences` inside the code (its page id and `Audiences.jsx`), so saved preferences keep working. Its data comes from the backend's `/cohorts/...` endpoints.

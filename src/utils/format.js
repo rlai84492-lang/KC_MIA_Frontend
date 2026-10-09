@@ -8,9 +8,6 @@ export const RANGE_LABELS = { 1: "Today", 7: "7 Days", 30: "30 Days" };
 // 12,345 (Indian digit grouping)
 export const fmt = (n) => numberFormat.format(Math.round(Number(n) || 0));
 
-// share of a in b, e.g. pct(15, 200) → "7.5%"
-export const pct = (a, b, dp = 1) => (b ? `${((100 * a) / b).toFixed(dp)}%` : "0%");
-
 // a percentage the backend already calculated (0–100), e.g. percent(94.3) → "94.3%"
 export const percent = (value, dp = 1) => `${(Number(value) || 0).toFixed(dp)}%`;
 
@@ -50,12 +47,4 @@ export function maskPhone(phone) {
   if (digits.length < 8) return phone || "";
   const local = digits.slice(-10);
   return `+91 ${local.slice(0, 5)} ••${local.slice(-3)}`;
-}
-
-// "+919820012345" → "+91 98200 12345"
-export function fullPhone(phone) {
-  const digits = String(phone || "").replace(/\D/g, "");
-  if (digits.length < 10) return phone || "";
-  const local = digits.slice(-10);
-  return `+91 ${local.slice(0, 5)} ${local.slice(5)}`;
 }

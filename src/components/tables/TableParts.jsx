@@ -39,16 +39,3 @@ export function PathPill({ path }) {
   if (!p) return <span className="pill p-mute">{path || "—"}</span>;
   return <span className={`pill ${p.pill}`}>{p.shortLabel}</span>;
 }
-
-const STATUS_TONE = {
-  Active: "p-good",
-  Completed: "p-violet",
-  Confirmed: "p-good",
-  Captured: "p-info",
-  Sent: "p-warn",
-  Idle: "p-mute"
-};
-
-export function StatusPill({ status }) {
-  return <span className={`pill ${STATUS_TONE[status] || "p-mute"}`}>{status}</span>;
-}

@@ -3,7 +3,7 @@
  *
  * The backend is the developer's DashboardController (base path /api/dashboard, port 8086 in development).
  * Every endpoint, parameter and field name below is exactly the backend's: the dashboard reads them as they
- * come and never renames them. src/services/mockDashboardProvider.js returns the same shapes from sample data.
+ * come and never renames them.
  *
  * Flow definitions (steps, buttons, categories, budgets) come from "Karwa Chauth Chatbot Flow Script v7"
  * and live in src/data/campaignConfig.js.

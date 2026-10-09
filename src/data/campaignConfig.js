@@ -1,6 +1,6 @@
 // Campaign configuration taken from "Karwa Chauth Chatbot Flow Script v6".
 // This is frontend configuration (labels, order, colours), not data: screens may import it.
-// The step codes and button ids are also listed in src/services/dashboardContract.js for the backend.
+// The step codes are also listed in src/services/dashboardContract.js for the backend.
 
 // toggleLabel / emoji / color / pill are display-only (path toggles, pills, charts).
 export const PATHS = [
@@ -13,7 +13,6 @@ export const PATH_BY_ID = Object.fromEntries(PATHS.map((p) => [p.id, p]));
 
 // Step 1A / 2A carousel, in carousel order. Mia Sutra is not shown on the sparkle path.
 export const CATEGORIES = ["Pendants", "Mia Sutra", "Pendant & Chain", "Necklaces", "Earrings", "Rings", "Bracelets & Bangles"];
-export const CATEGORY_EXCLUDED_ON = { sparkle: ["Mia Sutra"] };
 
 // The backend's code for each category (KarvaChauthConstants CAT_*). The Conversations Category filter sends the code.
 export const CATEGORY_CODES = {
@@ -25,10 +24,6 @@ export const CATEGORY_CODES = {
   "Rings": "RINGS",
   "Bracelets & Bangles": "BRACELETS_BANGLES"
 };
-
-
-// Step 1A-Budget / 2A-Budget list message rows.
-export const BUDGETS = ["Less than 20,000", "20,000 - 50,000", "Above 50,000"];
 
 // Path-specific bot flow steps, in flow order. `code` is the step id from the flow script.
 // `tone` is display-only (pill colour).
@@ -80,49 +75,6 @@ export const SHARED_STEPS = [
 export function stepDef(path, code) {
   return (PATH_STEPS[path] || []).find((s) => s.code === code) || SHARED_STEPS.find((s) => s.code === code) || null;
 }
-
-// Our own ids for every reply button / list row in the flow script. The backend should set these
-// ids on the outgoing interactive messages so a reply can be mapped back to its step.
-export const BUTTONS = {
-  IM_CELEBRATING: { label: "I'm celebrating", step: "0" },
-  SHOPPING_FOR_HER: { label: "I'm shopping for her", step: "0" },
-  HERE_FOR_SPARKLE: { label: "Here for the sparkle", step: "0" },
-  CHOOSE_MY_GIFT: { label: "Choose my gift", step: "1" },
-  SHOW_ME: { label: "Show me", step: "1-Sparkle" },
-  FIND_HER_A_GIFT: { label: "Find her a gift", step: "2" },
-  VISIT_NEARBY_STORE: { label: "Visit nearby store", step: "any" },
-  VISIT_STORE: { label: "Visit Store", step: "any" },
-  ADD_TO_LIST: { label: "Add to my list", step: "1B" },
-  SEE_MORE: { label: "See more", step: "1B" },
-  ANOTHER_CATEGORY: { label: "Another category", step: "1B / 1C" },
-  ADD_MORE: { label: "Add more", step: "1C" },
-  SEND_MY_ISHARA: { label: "Send my Ishara", step: "1C" },
-  SEND_TO_HUSBAND: { label: "Send to Husband", step: "1G" },
-  MAYBE_LATER: { label: "Maybe later", step: "1H" },
-  ADD_HIS_DETAILS: { label: "Add his details", step: "1I" },
-  KEEP_ME_POSTED: { label: "Yes, keep me posted", step: "1I" },
-  NO_THANKS: { label: "No thanks", step: "1I / 2E" },
-  YES_GO_AHEAD: { label: "Yes, go ahead", step: "1I-nudge" },
-  ILL_REMIND_HIM: { label: "I'll remind him", step: "1I-nudge" },
-  CONSENT_YES: { label: "Yes, that's fine", step: "1K / 2G" },
-  CONSENT_NO: { label: "No, don't message", step: "1K / 2G" },
-  BUY_THIS_FOR_HER: { label: "Buy this for her", step: "2B" },
-  BUY_ONLINE: { label: "Buy Online", step: "2C" },
-  ADD_HER_DETAILS: { label: "Add her details", step: "2E" },
-  OPEN_BOOKING_FORM: { label: "Open booking form", step: "C2" },
-  BROWSE_AGAIN: { label: "Browse again", step: "IDLE" },
-  NEW_CATEGORY: { label: "New category", step: "IDLE" }
-};
-
-// Step C2 WhatsApp Flow options.
-export const VISIT_DAYS = ["Today", "Tomorrow", "Sat"];
-export const VISIT_SLOTS = ["12:30 pm", "4:00 pm", "6:30 pm"];
-
-// Referral leads: who is referred on each path and which key date is asked for.
-export const REFERRAL_TYPES = {
-  celebrating: { relationship: "Husband", flowStep: "1J", keyDateType: "Anniversary" },
-  shopping: { relationship: "Wife", flowStep: "2F", keyDateType: "Birthday" }
-};
 
 // Audience segments (Audiences page). The backend only returns `id` + counts / members;
 // names and copy live here. "journey" segments are exclusive by `priority` (1 wins);
