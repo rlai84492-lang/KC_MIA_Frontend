@@ -1,0 +1,538 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  color: #2b1a21;
+  background: #faf6f0;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #faf6f0;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid #7a1f3d;
+  outline-offset: 2px;
+}
+
+::selection {
+  background: #edcfd6;
+  color: #52182d;
+}
+
+@layer components {
+  /* Surfaces — reference .panel / .panel-h */
+  .panel {
+    @apply min-w-0 overflow-hidden rounded-[20px] border border-kc-line bg-white;
+  }
+
+  .panel-header {
+    @apply flex items-center gap-3.5 border-b border-kc-line px-4 py-[18px] sm:px-[22px];
+  }
+
+  .panel-title {
+    @apply m-0 font-display text-xl font-medium text-kc-ink;
+  }
+
+  .muted {
+    @apply text-[13px] text-kc-ink3;
+  }
+
+  .panel-icon {
+    @apply grid h-[42px] w-[42px] flex-none place-items-center rounded-full bg-kc-accentSoft text-mia-700;
+  }
+
+  /* KPI cards — reference .cards / .card; first card in a row is the solid wine hero */
+  .kpi-grid {
+    @apply grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4;
+  }
+
+  .kpi {
+    @apply relative flex flex-col gap-0.5 overflow-hidden rounded-[18px] border border-kc-line bg-white px-3.5 pb-3.5 pt-[58px] text-kc-ink sm:px-5 sm:pb-[18px] sm:pt-[70px];
+  }
+
+  .kpi-icon {
+    @apply absolute left-3.5 top-3.5 grid h-9 w-9 place-items-center rounded-full bg-kc-accentSoft text-mia-700 sm:left-5 sm:top-[18px] sm:h-[42px] sm:w-[42px];
+  }
+
+  .kpi-value {
+    @apply font-display text-[26px] font-medium leading-tight tabular-nums text-kc-deep sm:text-[34px];
+  }
+
+  .kpi-label {
+    @apply text-[13px] font-medium text-kc-ink sm:text-[14.5px];
+  }
+
+  .kpi-detail {
+    @apply text-xs tabular-nums text-kc-ink3;
+  }
+
+  .kpi-grid > .kpi:first-child {
+    @apply border-transparent bg-mia-700;
+  }
+
+  .kpi-grid > .kpi:first-child .kpi-value,
+  .kpi-grid > .kpi:first-child .kpi-label {
+    color: #fff6f0;
+  }
+
+  .kpi-grid > .kpi:first-child .kpi-detail {
+    color: #f2c9d5;
+  }
+
+  .kpi-grid > .kpi:first-child .kpi-icon {
+    @apply bg-white/15 text-[#fff6f0];
+  }
+
+  /* Pill toggles — reference .flows / .range */
+  .seg-group {
+    @apply flex flex-wrap gap-0.5 rounded-full border border-kc-line bg-white p-[5px];
+  }
+
+  .seg-btn {
+    @apply inline-flex items-center gap-2 whitespace-nowrap rounded-full border-0 bg-transparent px-3 py-[7px] text-sm text-kc-ink2 transition-colors hover:bg-kc-panel2 sm:px-4 sm:py-2 sm:text-[15.5px];
+  }
+
+  .seg-btn[aria-pressed="true"] {
+    @apply bg-mia-700 text-white hover:bg-mia-700;
+  }
+
+  .seg-group.gold .seg-btn[aria-pressed="true"] {
+    @apply bg-gold-500 font-medium text-[#3a2410] hover:bg-gold-500;
+  }
+
+  /* Pills / badges — reference .pill */
+  .pill {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-[11px] py-1 text-[13px] font-semibold;
+  }
+
+  .pill::before {
+    content: "";
+    @apply h-1.5 w-1.5 rounded-full bg-current;
+  }
+
+  .p-rose { @apply bg-[#FBE7F0] text-[#B8336A]; }
+  .p-warn { @apply bg-[#FBF1DD] text-[#B7791F]; }
+  .p-info { @apply bg-[#E8F0FC] text-[#2F6FD0]; }
+  .p-good { @apply bg-[#E7F6EC] text-[#16A34A]; }
+  .p-violet { @apply bg-[#EEEBFB] text-[#6D5BD0]; }
+  .p-mute { @apply bg-kc-panel2 text-kc-ink2; }
+
+  /* Tables — reference th / td / .who / .ini */
+  .tbl {
+    @apply w-full min-w-[900px] border-collapse text-left;
+  }
+
+  .tbl th {
+    @apply whitespace-nowrap border-b border-kc-line bg-kc-panel2 px-[18px] py-3 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-kc-ink3;
+  }
+
+  .tbl td {
+    @apply border-b border-kc-line px-[18px] py-[13px] align-middle text-sm text-kc-ink;
+  }
+
+  .tbl tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .tbl .r {
+    @apply text-right;
+  }
+
+  .ini {
+    @apply grid h-9 w-9 flex-none place-items-center rounded-[10px] text-[12.5px] font-bold;
+  }
+
+  .mono {
+    @apply whitespace-nowrap tabular-nums tracking-[0.02em] text-kc-ink2;
+  }
+
+  /* Tools row above a table — reference .tools */
+  .tools {
+    @apply flex flex-wrap items-center gap-x-3.5 gap-y-2.5 border-b border-kc-line px-4 py-4 sm:px-[22px];
+  }
+
+  .tools-label {
+    @apply text-[13px] font-medium text-kc-ink3;
+  }
+
+  .field {
+    @apply rounded-[10px] border border-kc-line bg-white px-2.5 py-[7px] text-[13.5px] text-kc-ink outline-none focus:border-mia-400;
+  }
+
+  /* Horizontal bars — reference .hbars / .hb */
+  .hb {
+    @apply grid items-center gap-x-3 gap-y-1.5 text-[13.5px];
+    grid-template-columns: minmax(0, 1fr) 90px;
+  }
+
+  .hb-track {
+    @apply col-span-2 row-start-2 h-[22px] overflow-hidden rounded-md bg-kc-panel2;
+  }
+
+  .hb-track > span {
+    @apply block h-full rounded-md;
+  }
+
+  .hb-value {
+    @apply text-right tabular-nums text-kc-ink2;
+  }
+
+  @media (min-width: 640px) {
+    .hb {
+      grid-template-columns: 150px minmax(0, 1fr) 110px;
+    }
+
+    .hb-track {
+      @apply col-span-1 col-start-2 row-start-1;
+    }
+  }
+
+  .footer-note {
+    @apply flex flex-wrap items-center justify-between gap-2.5 px-4 py-3 text-[13px] text-kc-ink3 sm:px-[22px];
+  }
+}
+
+/* ───────── Overview + shared pieces (reference: .sechead, .tiles, .drow, .feed, .split, .pcards, #tip, .toast) ───────── */
+@layer components {
+  .sechead {
+    @apply -mb-1.5 flex flex-wrap items-baseline justify-between gap-2;
+  }
+  .sechead h2 {
+    @apply m-0 font-display text-[21px] font-medium;
+  }
+  .sechead span {
+    @apply text-[13px] text-kc-ink3;
+  }
+
+  .tiles {
+    @apply grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4;
+  }
+  .tile {
+    @apply grid min-w-0 gap-[3px] rounded-[20px] border border-kc-line bg-white px-4 pb-2.5 pt-3.5;
+  }
+  .tile.hero {
+    @apply border-transparent bg-kc-goldSoft;
+  }
+  .tile-label {
+    @apply flex justify-between gap-2 text-[13.5px] font-medium text-kc-ink2;
+  }
+  .tile-value {
+    @apply font-display text-2xl font-medium leading-tight tabular-nums sm:text-[30px];
+  }
+  .tile.hero .tile-value {
+    @apply text-mia-700;
+  }
+  .tile-foot {
+    @apply text-[12.5px] tabular-nums text-kc-ink3;
+  }
+  .tile svg {
+    @apply block h-[34px] w-full;
+  }
+  .tchip {
+    @apply whitespace-nowrap rounded-full bg-kc-panel2 px-2 py-0.5 text-[11px] font-semibold text-kc-ink3;
+  }
+
+  .drop {
+    @apply grid gap-[11px];
+  }
+  .drow {
+    @apply grid items-center gap-x-3.5 gap-y-1;
+    grid-template-columns: minmax(0, 1fr) 96px;
+  }
+  .drow-label {
+    @apply col-span-2 text-[13.5px] text-kc-ink2;
+  }
+  .drow-track {
+    @apply h-[30px] overflow-hidden rounded-lg bg-kc-panel2;
+  }
+  .drow-track > span {
+    @apply flex h-full min-w-[34px] items-center rounded-lg pl-2.5 text-[12.5px] font-semibold tabular-nums text-white;
+  }
+  .drow-value {
+    @apply font-bold tabular-nums;
+  }
+  .drow-value small {
+    @apply ml-1 text-xs font-normal text-kc-ink3;
+  }
+  @media (min-width: 640px) {
+    .drow {
+      grid-template-columns: 180px minmax(0, 1fr) 118px;
+    }
+    .drow-label {
+      @apply col-span-1 text-right;
+    }
+  }
+
+  .live {
+    @apply mb-3 inline-flex items-center gap-2 text-[13px] font-bold tracking-[0.08em] text-[#16A34A];
+  }
+  .live::before {
+    content: "";
+    @apply h-[9px] w-[9px] rounded-full bg-[#16A34A];
+    box-shadow: 0 0 0 4px #E7F6EC;
+  }
+  .feed {
+    @apply relative grid max-h-[470px] gap-3 overflow-y-auto pr-1;
+  }
+  .ev {
+    @apply grid gap-3;
+    grid-template-columns: 14px minmax(0, 1fr);
+  }
+  .ev-pin {
+    @apply mt-4 h-3 w-3 rounded-full border-2 border-white bg-current;
+    box-shadow: 0 0 0 2px currentColor;
+  }
+  .ev-box {
+    @apply grid min-w-0 gap-1 rounded-[14px] border px-3.5 py-2.5 text-kc-ink;
+  }
+  .ev-top {
+    @apply flex justify-between gap-2;
+  }
+  .ev-tag {
+    @apply rounded-md px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.1em];
+  }
+  .ev-time {
+    @apply whitespace-nowrap text-[12.5px] text-kc-ink3;
+  }
+  .ev-msg {
+    @apply text-sm;
+  }
+  .ev-msg b {
+    @apply font-semibold;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ev.new { animation: ev-slide 0.5s ease; }
+  }
+  @keyframes ev-slide {
+    from { opacity: 0; transform: translateY(-8px); }
+  }
+
+  .split {
+    @apply flex h-9 gap-0.5 overflow-hidden rounded-[10px];
+  }
+  .legend {
+    @apply mt-3 flex flex-wrap gap-x-[18px] gap-y-2 text-[13.5px];
+  }
+  .legend span {
+    @apply inline-flex items-center gap-[7px];
+  }
+  .dot {
+    @apply inline-block h-2.5 w-2.5 rounded-full;
+  }
+
+  .pcards {
+    @apply grid gap-4 lg:grid-cols-3;
+  }
+  .pcard {
+    @apply grid min-w-0 gap-2.5 rounded-[20px] border border-kc-line bg-white p-4;
+  }
+  .pcard-head {
+    @apply flex items-center gap-2 text-[15px] font-semibold;
+  }
+  .pcard-goal {
+    @apply text-[13px] text-kc-ink2;
+  }
+  .pstats {
+    @apply grid grid-cols-2 gap-2;
+  }
+  .pstat {
+    @apply rounded-[10px] bg-kc-panel2 px-2.5 py-2;
+  }
+  .pstat-value {
+    @apply font-display text-[21px] font-semibold tabular-nums;
+  }
+  .pstat-label {
+    @apply text-xs text-kc-ink2;
+  }
+
+  .tip {
+    @apply pointer-events-none fixed z-40 max-w-[240px] rounded-lg bg-kc-ink px-2.5 py-[7px] text-[12.5px] text-kc-bg;
+  }
+  .toast {
+    @apply fixed bottom-5 left-1/2 z-30 -translate-x-1/2 rounded-[10px] bg-kc-ink px-4 py-2.5 text-sm text-kc-bg;
+  }
+}
+
+/* Feed event colours: one class per backend `badge` (GET /activity), "k-" + the badge in lower case
+   (MSG → k-msg, ISHARA → k-ishara, OPT-IN → k-opt-in …). Outside @layer on purpose: the class names are
+   built at runtime, so Tailwind cannot see them and would drop them from a layer. */
+.k-msg { color: #2F6FD0; } .k-msg .ev-box { background: #E8F0FC; border-color: rgba(47, 111, 208, .25); } .k-msg .ev-tag { background: rgba(47, 111, 208, .15); color: rgb(47, 111, 208); }
+.k-ishara { color: #B8336A; } .k-ishara .ev-box { background: #FBE7F0; border-color: rgba(184, 51, 106, .25); } .k-ishara .ev-tag { background: rgba(184, 51, 106, .15); color: rgb(184, 51, 106); }
+.k-visit { color: #16A34A; } .k-visit .ev-box { background: #E7F6EC; border-color: rgba(22, 163, 74, .25); } .k-visit .ev-tag { background: rgba(22, 163, 74, .15); color: rgb(22, 163, 74); }
+.k-referral, .k-lead { color: #6D5BD0; } .k-referral .ev-box, .k-lead .ev-box { background: #EEEBFB; border-color: rgba(109, 91, 208, .25); } .k-referral .ev-tag, .k-lead .ev-tag { background: rgba(109, 91, 208, .15); color: rgb(109, 91, 208); }
+.k-buy { color: #B7791F; } .k-buy .ev-box { background: #FBF1DD; border-color: rgba(183, 121, 31, .25); } .k-buy .ev-tag { background: rgba(183, 121, 31, .15); color: rgb(183, 121, 31); }
+.k-opt-in { color: #0E7C86; } .k-opt-in .ev-box { background: #E3F4F5; border-color: rgba(14, 124, 134, .25); } .k-opt-in .ev-tag { background: rgba(14, 124, 134, .15); color: rgb(14, 124, 134); }
+.k-opt-out { color: #6B6B6B; } .k-opt-out .ev-box { background: #F1F1F1; border-color: rgba(107, 107, 107, .25); } .k-opt-out .ev-tag { background: rgba(107, 107, 107, .15); color: rgb(107, 107, 107); }
+
+
+/* ───────── Tables: chips, pager, KPI row widths (reference: .chips, .pager, .cards.five / .three) ───────── */
+@layer components {
+  .kpi-grid.five {
+    @apply xl:grid-cols-5;
+  }
+  .kpi-grid.three {
+    @apply sm:grid-cols-3 xl:grid-cols-3;
+  }
+  .chips {
+    @apply flex flex-wrap gap-1.5;
+  }
+  .chip {
+    @apply rounded-[9px] border border-kc-line bg-white px-3 py-[5px] text-[13.5px] font-medium text-kc-ink hover:bg-kc-panel2;
+  }
+  .chip[aria-pressed="true"] {
+    @apply border-mia-700 bg-mia-700 text-white hover:bg-mia-700;
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-[10px] bg-mia-700 px-4 py-[9px] text-sm font-semibold text-white hover:bg-mia-800 disabled:cursor-default disabled:opacity-50;
+  }
+  .sort-btn {
+    @apply inline-flex items-center gap-1 uppercase tracking-[inherit];
+  }
+  .sort-btn[data-active="true"] {
+    @apply text-mia-700;
+  }
+  .pager {
+    @apply flex flex-wrap items-center justify-between gap-2.5 border-t border-kc-line px-4 py-3 text-[13px] text-kc-ink3 sm:px-[22px];
+  }
+  .pager button {
+    @apply rounded-lg border border-kc-line bg-white px-3 py-[5px] text-kc-ink disabled:cursor-default disabled:opacity-40;
+  }
+  .empty {
+    @apply px-[22px] py-12 text-center text-kc-ink3;
+  }
+}
+
+/* Tighter cells for wide tables (Referral Leads has 7 columns of two-line cells). */
+@layer components {
+  .tbl.compact th,
+  .tbl.compact td {
+    @apply px-3;
+  }
+  .tbl.compact th:first-child,
+  .tbl.compact td:first-child {
+    @apply pl-[18px];
+  }
+}
+
+/* ───────── Audiences (reference: .segs, .seg, .prio, .opts, .builder, .bresult) ───────── */
+@layer components {
+  .segcards {
+    @apply grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 2xl:grid-cols-4;
+  }
+  .segcard {
+    @apply grid min-w-0 content-start gap-2.5 rounded-[18px] border border-kc-line bg-white px-4 pb-3.5 pt-4;
+  }
+  .segcard.wide {
+    @apply col-span-full items-center gap-x-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto];
+  }
+  .segcard.wide .segcard-head,
+  .segcard.wide .segcard-def,
+  .segcard.wide .segcard-meta {
+    @apply md:col-start-1;
+  }
+  .segcard.wide .segcard-next {
+    @apply md:col-start-2 md:row-start-1;
+  }
+  .segcard.wide .segcard-use {
+    @apply md:col-start-2 md:row-start-2;
+  }
+  .segcard.wide .segcard-acts {
+    @apply md:col-start-3 md:row-span-3 md:row-start-1;
+  }
+  .segcard-head {
+    @apply flex items-start justify-between gap-2.5;
+  }
+  .segcard-name {
+    @apply font-display text-lg font-medium leading-tight;
+  }
+  .segcard-count {
+    @apply whitespace-nowrap font-display text-[26px] font-medium tabular-nums text-mia-700;
+  }
+  .segcard-def {
+    @apply text-[13.5px] text-kc-ink2;
+  }
+  .segcard-meta {
+    @apply flex flex-wrap gap-1.5;
+  }
+  .segcard-next {
+    @apply rounded-[10px] bg-kc-panel2 px-2.5 py-2 text-[13px];
+  }
+  .segcard-next span {
+    @apply text-kc-ink3;
+  }
+  .segcard-use {
+    @apply text-[12.5px] text-kc-ink3;
+  }
+  .segcard-use b {
+    @apply font-semibold text-kc-ink2;
+  }
+  .segcard-acts {
+    @apply flex flex-wrap gap-2;
+  }
+  .btn.sm {
+    @apply px-3 py-[7px] text-[13.5px];
+  }
+  .prio {
+    @apply flex flex-wrap items-center gap-2 text-[13px] text-kc-ink2;
+  }
+  .prio-n {
+    @apply mr-1.5 inline-grid h-5 w-5 place-items-center rounded-full bg-mia-700 text-[11px] font-bold text-white;
+  }
+  .prio-arrow {
+    @apply text-kc-ink3;
+  }
+  .opts {
+    @apply flex cursor-pointer items-center gap-2 text-[13.5px] text-kc-ink2;
+  }
+  .opts input {
+    accent-color: theme("colors.mia.700");
+  }
+  .builder {
+    @apply grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3;
+  }
+  .builder label {
+    @apply grid gap-[5px] text-[12.5px] font-medium text-kc-ink3;
+  }
+  .builder select {
+    @apply w-full;
+  }
+  .bresult {
+    @apply mt-4 flex flex-wrap items-center justify-between gap-3.5 border-t border-kc-line pt-3.5;
+  }
+  .bresult-count {
+    @apply font-display text-[28px] tabular-nums text-mia-700;
+  }
+}
+
+/* ───────── Phase 5: refresh banner, sidebar counts ───────── */
+@layer components {
+  .refresh-banner {
+    @apply flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-900;
+  }
+  .nav-count {
+    @apply ml-auto rounded-full bg-kc-panel2 px-2 py-px text-xs font-semibold tabular-nums text-kc-ink3;
+  }
+}
