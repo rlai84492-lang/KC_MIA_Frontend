@@ -101,19 +101,9 @@ function DashboardApp({ user, onLogout }) {
         <Sidebar view={view} onNavigate={setView} />
 
         <main className="flex min-w-0 flex-1 flex-col">
-          <Topbar view={view} onNavigate={setView} />
+          <Topbar view={view} onNavigate={setView} user={user} onLogout={onLogout} />
 
-          <div className="grid grid-cols-[minmax(0,1fr)] content-start gap-5 px-4 pb-11 pt-[18px] lg:pl-7 lg:pr-[34px]">
-            <div className="flex items-center justify-end gap-3 text-sm">
-              <span className="opacity-70">Signed in as {user.username}</span>
-              <button
-                type="button"
-                onClick={onLogout}
-                className="rounded-lg border border-black/15 px-3 py-1.5 hover:bg-black/5"
-              >
-                Log out
-              </button>
-            </div>
+          <div className="grid grid-cols-[minmax(0,1fr)] content-start gap-5 px-4 pb-11 pt-3.5 lg:pl-7 lg:pr-[34px]">
             <RefreshBanner />
             {page}
           </div>

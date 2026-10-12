@@ -108,11 +108,11 @@ button {
 
   /* Pill toggles — reference .flows / .range */
   .seg-group {
-    @apply flex flex-wrap gap-0.5 rounded-full border border-kc-line bg-white p-[5px];
+    @apply flex flex-wrap gap-0.5 rounded-full border border-kc-line bg-white p-1;
   }
 
   .seg-btn {
-    @apply inline-flex items-center gap-2 whitespace-nowrap rounded-full border-0 bg-transparent px-3 py-[7px] text-sm text-kc-ink2 transition-colors hover:bg-kc-panel2 sm:px-4 sm:py-2 sm:text-[15.5px];
+    @apply inline-flex items-center gap-2 whitespace-nowrap rounded-full border-0 bg-transparent px-3 py-[7px] text-sm text-kc-ink2 transition-colors hover:bg-kc-panel2 sm:px-3.5 sm:py-1.5 sm:text-[15px];
   }
 
   .seg-btn[aria-pressed="true"] {

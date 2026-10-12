@@ -1,0 +1,781 @@
+/* Login page (src/pages/Login.jsx). Every class starts with "kcl-" so nothing here affects the dashboard. */
+
+.kcl-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #060208;
+  font-family: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ── Background: deep gradient sky + nebula clouds ── */
+.kcl-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 72% 0%, #1e0a30 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 20% 100%, #1a0810 0%, transparent 55%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, #0c0415 0%, #060208 100%);
+}
+
+.kcl-nebula {
+  position: fixed;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  animation: kcl-nebdrift 18s ease-in-out infinite alternate;
+}
+
+.kcl-n1 { top: 10%; left: 5%; width: 500px; height: 300px; background: rgba(120, 40, 180, 0.08); }
+.kcl-n2 { right: 5%; bottom: 15%; width: 400px; height: 250px; background: rgba(180, 80, 40, 0.06); animation-duration: 22s; animation-direction: alternate-reverse; }
+.kcl-n3 { top: 40%; left: 30%; width: 300px; height: 200px; background: rgba(200, 160, 40, 0.05); animation-duration: 26s; }
+
+@keyframes kcl-nebdrift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 20px) scale(1.08); }
+}
+
+/* ── Stars ── */
+.kcl-star {
+  position: fixed;
+  z-index: 0;
+  border-radius: 50%;
+  background: #fff;
+  animation: kcl-twinkle 3s ease-in-out infinite;
+}
+
+@keyframes kcl-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: var(--kcl-op, 0.9); transform: scale(1.4); }
+}
+
+/* ── Shooting stars ── */
+.kcl-shoot {
+  position: fixed;
+  z-index: 1;
+  height: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(to right, transparent, #f5c842, transparent);
+  opacity: 0;
+  animation: kcl-shoot 8s ease-in infinite;
+}
+
+@keyframes kcl-shoot {
+  0% { opacity: 0; translate: 0 0; }
+  5% { opacity: 1; }
+  30% { opacity: 0; translate: -300px 200px; }
+  100% { opacity: 0; translate: -300px 200px; }
+}
+
+/* ── Moon with three soft halos ── */
+.kcl-moon-scene {
+  position: fixed;
+  top: -30px;
+  right: 60px;
+  z-index: 2;
+}
+
+.kcl-halo {
+  position: absolute;
+  border-radius: 50%;
+  animation: kcl-hpulse 5s ease-in-out infinite;
+}
+
+.kcl-halo-3 { top: -70px; left: -70px; width: 340px; height: 340px; background: radial-gradient(circle, rgba(245, 200, 66, 0.05) 0%, transparent 70%); }
+.kcl-halo-2 { top: -20px; left: -20px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(245, 200, 66, 0.09) 0%, transparent 70%); animation-delay: 0.5s; }
+.kcl-halo-1 { top: 10px; left: 10px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(245, 200, 66, 0.15) 0%, transparent 70%); animation-delay: 1s; }
+
+@keyframes kcl-hpulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.8; }
+}
+
+/* Crescent: a gold disk with a sky-coloured circle over it */
+.kcl-moon-disk {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: #f5c842;
+  box-shadow: 0 0 60px rgba(245, 200, 66, 0.6), 0 0 120px rgba(245, 200, 66, 0.25), inset -8px -4px 20px rgba(200, 150, 0, 0.3);
+}
+
+.kcl-moon-shadow {
+  position: absolute;
+  top: -12px;
+  left: 22px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #060208;
+}
+
+.kcl-crater {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.kcl-crater-1 { top: 28px; left: 38px; width: 14px; height: 14px; opacity: 0.08; }
+.kcl-crater-2 { top: 50px; left: 24px; width: 8px; height: 8px; opacity: 0.06; }
+
+/* ── Rangoli petals ── */
+.kcl-petal {
+  position: fixed;
+  z-index: 1;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: kcl-petaldrift 8s ease-in-out infinite;
+}
+
+@keyframes kcl-petaldrift {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }
+}
+
+/* ── Floating diyas ── */
+.kcl-diya {
+  position: fixed;
+  z-index: 3;
+  animation: kcl-fdrift 6s ease-in-out infinite;
+}
+
+@keyframes kcl-fdrift {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+
+.kcl-diya-glow {
+  position: absolute;
+  top: -20px;
+  left: -18px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 140, 0, 0.2) 0%, transparent 70%);
+  animation: kcl-flameglow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes kcl-flameglow {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.kcl-diya-flame {
+  position: relative;
+  width: 9px;
+  height: 16px;
+  margin: 0 auto;
+  border-radius: 50% 50% 30% 30%;
+  background: #ff7800;
+  animation: kcl-flicker 0.7s ease-in-out infinite alternate;
+}
+
+.kcl-diya-flame::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 5px;
+  height: 10px;
+  border-radius: 50% 50% 30% 30%;
+  background: #ffcc00;
+}
+
+@keyframes kcl-flicker {
+  0% { transform: scaleX(1) scaleY(1) rotate(-3deg); }
+  100% { transform: scaleX(0.8) scaleY(1.15) rotate(3deg); }
+}
+
+.kcl-diya-rim {
+  width: 30px;
+  height: 4px;
+  margin: 0 auto;
+  border-radius: 3px;
+  background: #d4940f;
+}
+
+.kcl-diya-base {
+  width: 26px;
+  height: 11px;
+  margin: 2px auto 0;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(to bottom, #c8860b, #8b5a08);
+}
+
+/* ── Card ── */
+.kcl-card-wrap {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 460px;
+  padding: 16px;
+}
+
+/* Thin glowing ring just outside the card */
+.kcl-outer-ring {
+  position: absolute;
+  inset: -20px;
+  border: 1px solid rgba(180, 120, 40, 0.1);
+  border-radius: 40px;
+  pointer-events: none;
+  animation: kcl-ringglow 4s ease-in-out infinite alternate;
+}
+
+@keyframes kcl-ringglow {
+  0% { border-color: rgba(180, 120, 40, 0.05); }
+  100% { border-color: rgba(180, 120, 40, 0.18); }
+}
+
+.kcl-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(180, 110, 30, 0.2);
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(20, 8, 8, 0.96) 0%, rgba(14, 5, 5, 0.98) 50%, rgba(18, 6, 10, 0.96) 100%);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(245, 200, 66, 0.04), inset 0 1px 0 rgba(245, 200, 66, 0.08);
+}
+
+.kcl-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.06) 0%, transparent 40%, transparent 60%, rgba(180, 60, 60, 0.04) 100%);
+  pointer-events: none;
+}
+
+/* Gold strips along the top and bottom edges */
+.kcl-strip-top {
+  height: 3px;
+  background: linear-gradient(to right, transparent, #8b6010, #f5c842, #d4a012, #8b6010, transparent);
+  opacity: 0.8;
+}
+
+.kcl-strip-bottom {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #8b6010, #f5c842, #8b6010, transparent);
+  opacity: 0.5;
+}
+
+/* Corner ornaments, each with a dot at both ends */
+.kcl-orn {
+  position: absolute;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  opacity: 0.5;
+}
+
+.kcl-orn::before,
+.kcl-orn::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d4a012;
+  opacity: 0.8;
+}
+
+.kcl-orn::after {
+  opacity: 0.3;
+}
+
+.kcl-orn-tl { top: 16px; left: 16px; border-top: 1.5px solid #d4a012; border-left: 1.5px solid #d4a012; border-radius: 6px 0 0 0; }
+.kcl-orn-tr { top: 16px; right: 16px; border-top: 1.5px solid #d4a012; border-right: 1.5px solid #d4a012; border-radius: 0 6px 0 0; }
+.kcl-orn-bl { bottom: 16px; left: 16px; border-bottom: 1.5px solid #d4a012; border-left: 1.5px solid #d4a012; border-radius: 0 0 0 6px; }
+.kcl-orn-br { bottom: 16px; right: 16px; border-bottom: 1.5px solid #d4a012; border-right: 1.5px solid #d4a012; border-radius: 0 0 6px 0; }
+
+.kcl-orn-tl::before { top: -2px; left: -2px; }
+.kcl-orn-tl::after { right: -2px; bottom: -2px; }
+.kcl-orn-tr::before { top: -2px; right: -2px; }
+.kcl-orn-tr::after { bottom: -2px; left: -2px; }
+.kcl-orn-bl::before { bottom: -2px; left: -2px; }
+.kcl-orn-bl::after { top: -2px; right: -2px; }
+.kcl-orn-br::before { right: -2px; bottom: -2px; }
+.kcl-orn-br::after { top: -2px; left: -2px; }
+
+.kcl-card-inner {
+  position: relative;
+  z-index: 1;
+  padding: 44px 44px 40px;
+}
+
+/* ── Header ── */
+.kcl-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+/* Chalni (sieve): two slowly turning rings with 12 tick marks, around a glowing centre */
+.kcl-chalni {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+}
+
+.kcl-chalni-ring3 {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(245, 200, 66, 0.12);
+  border-radius: 50%;
+  animation: kcl-cspin 20s linear infinite;
+}
+
+.kcl-chalni-ring2 {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(245, 200, 66, 0.2);
+  border-radius: 50%;
+  animation: kcl-cspin 15s linear infinite reverse;
+}
+
+.kcl-chalni-ring1 {
+  position: absolute;
+  inset: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #b8860b;
+  border-radius: 50%;
+}
+
+.kcl-chalni-center {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f5c842;
+  box-shadow: 0 0 12px rgba(245, 200, 66, 0.9), 0 0 24px rgba(245, 200, 66, 0.4);
+}
+
+.kcl-tick {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 3px;
+  height: 7px;
+  border-radius: 2px;
+  background: #d4a012;
+  opacity: 0.6;
+  transform-origin: 50% 36px;
+}
+
+@keyframes kcl-cspin {
+  to { transform: rotate(360deg); }
+}
+
+.kcl-brand {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: #f5c842;
+  text-shadow: 0 0 40px rgba(245, 200, 66, 0.3);
+}
+
+.kcl-festival-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 4px 14px;
+  border: 1px solid rgba(180, 120, 30, 0.35);
+  border-radius: 20px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #b8860b;
+}
+
+.kcl-pill-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f5c842;
+  box-shadow: 0 0 6px rgba(245, 200, 66, 0.8);
+}
+
+/* ── Divider: line · three diamonds · line ── */
+.kcl-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0 28px;
+}
+
+.kcl-div-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(180, 110, 30, 0.3));
+}
+
+.kcl-div-line-r {
+  background: linear-gradient(to left, transparent, rgba(180, 110, 30, 0.3));
+}
+
+.kcl-div-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.kcl-div-diamond {
+  width: 5px;
+  height: 5px;
+  background: #b8860b;
+  transform: rotate(45deg);
+}
+
+.kcl-div-diamond-sm {
+  width: 3px;
+  height: 3px;
+  background: #8a6030;
+  transform: rotate(45deg);
+}
+
+/* ── Form ── */
+.kcl-error {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(200, 50, 50, 0.3);
+  border-radius: 8px;
+  background: rgba(140, 20, 20, 0.15);
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  color: #e07070;
+  animation: kcl-fadein 0.3s ease;
+}
+
+@keyframes kcl-fadein {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kcl-field {
+  margin-bottom: 18px;
+}
+
+.kcl-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #8a6030;
+}
+
+.kcl-input-wrap {
+  position: relative;
+}
+
+.kcl-icon-wrap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  color: #4a2515;
+  pointer-events: none;
+  transition: color 0.25s;
+}
+
+.kcl-input-wrap:focus-within .kcl-icon-wrap {
+  color: #b8860b;
+}
+
+.kcl-input {
+  width: 100%;
+  padding: 13px 14px 13px 46px;
+  border: 1px solid rgba(90, 45, 26, 0.45);
+  border-radius: 10px;
+  background: rgba(8, 3, 3, 0.7);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.3px;
+  color: #f5e6d0;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.kcl-input-password {
+  padding-right: 46px;
+}
+
+.kcl-input::placeholder {
+  font-weight: 300;
+  color: #6b3a26;
+}
+
+.kcl-input:hover {
+  border-color: rgba(180, 120, 40, 0.4);
+  background: rgba(10, 4, 4, 0.8);
+}
+
+.kcl-input:focus {
+  border-color: rgba(245, 200, 66, 0.4);
+  background: rgba(12, 5, 5, 0.9);
+  box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.07), 0 0 20px rgba(245, 200, 66, 0.05);
+}
+
+.kcl-input[aria-invalid="true"] {
+  border-color: rgba(200, 50, 50, 0.5);
+  box-shadow: 0 0 0 3px rgba(200, 50, 50, 0.07);
+}
+
+/* The dashboard's crimson focus outline (index.css) is replaced here: inputs use the gold glow above,
+   other controls get a gold outline that shows on the dark background. */
+.kcl-input:focus-visible {
+  outline: none;
+}
+
+.kcl-page :focus-visible {
+  outline-color: #f5c842;
+}
+
+.kcl-eye {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  border: 0;
+  background: none;
+  color: #4a2515;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.kcl-eye:hover,
+.kcl-eye:focus-visible {
+  color: #b8860b;
+}
+
+.kcl-field-error {
+  margin: 6px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: #e0675a;
+}
+
+/* Gold button with a light sweep on hover */
+.kcl-btn {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #0d0505;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.kcl-btn-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #8b6010 0%, #c8920e 35%, #f5c842 60%, #d4a012 80%, #8b6010 100%);
+  background-size: 200% 100%;
+  transition: background-position 0.4s ease, box-shadow 0.3s;
+}
+
+.kcl-btn-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.25) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.kcl-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.kcl-btn:hover:not(:disabled) .kcl-btn-bg,
+.kcl-btn:focus-visible .kcl-btn-bg {
+  background-position: 100% 0;
+  box-shadow: 0 8px 30px rgba(180, 134, 11, 0.4);
+}
+
+.kcl-btn:hover:not(:disabled) .kcl-btn-shimmer {
+  transform: translateX(100%);
+}
+
+.kcl-btn:focus-visible {
+  outline: 2px solid #f5c842;
+  outline-offset: 3px;
+}
+
+.kcl-btn:disabled {
+  cursor: wait;
+  opacity: 0.85;
+}
+
+.kcl-btn-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.kcl-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(13, 5, 5, 0.25);
+  border-top-color: #0d0505;
+  border-radius: 50%;
+  animation: kcl-loader-spin 0.7s linear infinite;
+}
+
+@keyframes kcl-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+.kcl-shake {
+  animation: kcl-shake 0.35s ease;
+}
+
+@keyframes kcl-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* ── "Welcome Back" after a successful sign-in ── */
+.kcl-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: radial-gradient(ellipse at center, rgba(30, 10, 5, 0.98) 0%, rgba(6, 2, 8, 0.99) 100%);
+  animation: kcl-fade 0.6s ease;
+}
+
+@keyframes kcl-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.kcl-welcome-diyas {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.kcl-welcome-diya {
+  font-size: 28px;
+  animation: kcl-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.kcl-welcome-diya:nth-child(2) { font-size: 36px; animation-delay: 0.1s; }
+.kcl-welcome-diya:nth-child(3) { animation-delay: 0.2s; }
+
+@keyframes kcl-pop {
+  0% { transform: scale(0) rotate(-20deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.kcl-welcome-line {
+  width: 120px;
+  height: 1px;
+  margin: 8px auto;
+  background: linear-gradient(to right, transparent, #b8860b, transparent);
+}
+
+.kcl-welcome-title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: #f5c842;
+}
+
+.kcl-welcome-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #8a6030;
+}
+
+.kcl-welcome-note {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7a4a20;
+}
+
+/* ── Phones ── */
+@media (max-width: 480px) {
+  .kcl-card-inner {
+    padding: 40px 26px 32px;
+  }
+
+  .kcl-brand {
+    font-size: 28px;
+    letter-spacing: 6px;
+  }
+
+  .kcl-moon-scene {
+    right: 8px;
+    transform: scale(0.6);
+    transform-origin: top right;
+  }
+
+  .kcl-nebula,
+  .kcl-diya-wide {
+    display: none;
+  }
+}
+
+/* People who turn off animations in their system settings get a still page. */
+@media (prefers-reduced-motion: reduce) {
+  .kcl-page *,
+  .kcl-page *::before,
+  .kcl-page *::after,
+  .kcl-welcome,
+  .kcl-welcome * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .kcl-shoot {
+    display: none;
+  }
+}

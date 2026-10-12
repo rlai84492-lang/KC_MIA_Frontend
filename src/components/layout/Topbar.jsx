@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { RefreshCw } from "lucide-react";
+import { LogOut, RefreshCw } from "lucide-react";
 import { PATHS } from "../../data/campaignConfig";
 import { useDashboard } from "../../context/DashboardContext";
 import { NAV } from "./Sidebar";
@@ -18,7 +18,7 @@ const TITLES = {
 // Views that show only the "All paths" toggle.
 const ALL_PATHS_ONLY = ["audiences", "referrals", "visits"];
 
-export default function Topbar({ view, onNavigate }) {
+export default function Topbar({ view, onNavigate, user, onLogout }) {
   const { filters, setFilters, refresh, loading, error, updatedAt, settled } = useDashboard();
   const toast = useToast();
   const manualRefresh = useRef(null); // `settled` value when Refresh was pressed
@@ -54,21 +54,42 @@ export default function Topbar({ view, onNavigate }) {
 
   return (
     <>
-      <header className="flex flex-wrap items-start justify-between gap-4 px-4 pb-2.5 pt-5 lg:pl-9 lg:pr-[34px] lg:pt-9">
-        <div>
-          <div className="mb-1 flex items-center gap-2 lg:hidden">
-            <span className="font-display text-lg font-medium text-kc-deep">Mia by Tanishq</span>
-            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-kc-rose">Karwa Chauth CRM</span>
+      <header className="flex items-center justify-between gap-3 px-4 pb-1 pt-4 lg:pl-7 lg:pr-[34px] lg:pt-6">
+        <div className="min-w-0">
+          <div className="mb-1 flex flex-wrap items-center gap-x-2 lg:hidden">
+            <span className="whitespace-nowrap font-display text-lg font-medium text-kc-deep">Mia by Tanishq</span>
+            <span className="whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.06em] text-kc-rose">Karwa Chauth CRM</span>
           </div>
-          <h1 className="m-0 font-display text-[28px] font-medium leading-tight tracking-[-0.01em] text-kc-deep lg:text-4xl">
+          <h1 className="m-0 font-display text-[28px] font-medium leading-tight tracking-[-0.01em] text-kc-deep lg:text-[34px]">
             {title}
           </h1>
-          <div className="mt-1.5 text-[15.5px] text-kc-ink2">
+          <div className="mt-0.5 text-[15px] text-kc-ink2">
             {subtitle}
             {updatedAt && <> · Updated {istTime(updatedAt)}</>}
           </div>
         </div>
+
+        {/* Signed-in user + Log out, top-right (reference: "Mia Admin") */}
+        {user && (
+          <div className="flex flex-none items-center gap-2 rounded-full border border-kc-line bg-white py-1 pl-1 pr-1.5">
+            <span className="grid h-8 w-8 flex-none place-items-center rounded-full bg-mia-700 text-[13px] font-semibold uppercase text-white" aria-hidden="true">
+              {user.username.slice(0, 2)}
+            </span>
+            <span className="hidden max-w-[160px] truncate text-[15px] text-kc-ink sm:inline">{user.username}</span>
+            <button
+              type="button"
+              onClick={onLogout}
+              aria-label="Log out"
+              title={`Signed in as ${user.username}`}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm text-kc-ink2 hover:bg-kc-panel2"
+            >
+              <LogOut size={15} aria-hidden="true" />
+              <span className="hidden sm:inline">Log out</span>
+            </button>
+          </div>
+        )}
       </header>
+
 
       <nav className="flex gap-1 overflow-x-auto px-4 pb-2 lg:hidden" aria-label="Sections">
         {NAV.map(([id, label]) => (
@@ -86,7 +107,7 @@ export default function Topbar({ view, onNavigate }) {
         ))}
       </nav>
 
-      <div className="z-10 flex flex-wrap items-center justify-between gap-3 bg-kc-bg px-4 pb-1.5 pt-2.5 lg:sticky lg:top-0 lg:pl-7 lg:pr-[34px]">
+      <div className="z-10 flex flex-wrap items-center justify-between gap-3 bg-kc-bg px-4 pb-1 pt-2 lg:sticky lg:top-0 lg:pl-7 lg:pr-[34px]">
         <div className="seg-group" role="group" aria-label="Chatbot path">
           {pathOptions.map((p) => (
             <button
@@ -123,9 +144,9 @@ export default function Topbar({ view, onNavigate }) {
             disabled={loading}
             aria-label="Refresh"
             title="Refresh"
-            className="grid h-11 w-11 flex-none place-items-center rounded-full border border-kc-line bg-white text-kc-ink2 hover:bg-kc-panel2 disabled:opacity-50"
+            className="grid h-10 w-10 flex-none place-items-center rounded-full border border-kc-line bg-white text-kc-ink2 hover:bg-kc-panel2 disabled:opacity-50"
           >
-            <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+            <RefreshCw size={17} className={loading ? "animate-spin" : ""} />
           </button>
         </div>
       </div>
