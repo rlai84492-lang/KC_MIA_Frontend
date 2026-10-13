@@ -6,7 +6,7 @@ This file records every data-related change to the dashboard and explains how ea
 
 ## Going live with real data
 
-_Last updated: Change 11 (mock data removed: the dashboard reads only the developer's backend, `DashboardController`, with its exact endpoint, parameter and field names)._
+_Last updated: Change 12 (Overview "Total Delivered" card). The dashboard reads only the developer's backend, `DashboardController`, with its exact endpoint, parameter and field names._
 
 ### Overall flow
 
@@ -71,8 +71,8 @@ The Karix API key and webhook secret live **only on the backend**. They must nev
 
 ### Open items for the backend
 
-1. **Azure VM: the dashboard APIs are missing (blocking).** Checked 9 Oct 2026: nginx forwards `/api/` and security no longer blocks it, but every `/api/dashboard/...` request returns Spring's JSON 404 (`{"status":404,"error":"Not Found","path":"/api/dashboard/metric-cards"}`). The app answering on the VM has no `DashboardController` routes: an old build was deployed, nginx forwards to a different app/port, or the controller isn't loaded. The developer must deploy the build with `DashboardController` (including `/category-budget-picks`) and check that nginx `proxy_pass` points at it. Done when `https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com/api/dashboard/metric-cards?range=custom&from=2026-10-09&to=2026-10-09&flow=all` returns 200 with JSON.
-2. **Security:** keep `karvachauth.dashboard.open-for-testing=true` in the VM's configuration (earlier every request returned 403) until the agreed access rule is in place.
+1. **Azure VM: resolved (checked 12 Oct 2026).** The 404 from 9 Oct is fixed: the dashboard APIs exist on the VM and answer `401 Unauthorized` until you sign in. The developer's build of the dashboard is live at `https://karvachauth-rlai.indiasouthcentral.cloudapp.azure.com/dashboard/`, and `npm run dev` with `BACKEND_URL` set to the VM shows live data after signing in.
+2. **Security: login is in place.** The developer added a login (`POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`, session cookie; see `src/services/authApi.js`). Every dashboard API needs it, and any 401 sends the dashboard back to the login page. Credentials come from the developer and are never stored in this app.
 3. **Budget labels:** `BUDGET_LABELS` in `DashboardServiceImple.java` uses "Less than ₹20,000", "₹20,000 – ₹50,000", "Above ₹50,000". They must be exactly "Less than 20,000", "20,000 - 50,000", "Above 50,000" (no ₹, plain hyphen). They show in the Overview "Budget Chosen" panel, the Conversations Budget column and the cohort downloads.
 4. **Activity Feed event id:** `/activity` has no event id; the feed tells events apart by `timestamp` + `summary`. An id would be more reliable.
 5. **Full phone numbers in exports:** `/conversations/export` and `/referral-leads/export` send full numbers. The dashboard masks them in the CSV, but masking them on the server would be safer. Cohort downloads follow `fullMobile` correctly; the controller's default for `fullMobile` should be `false`.
@@ -84,7 +84,7 @@ The Karix API key and webhook secret live **only on the backend**. They must nev
 
 ### Field checklist
 
-The dashboard reads these exact names. The full shapes are in `dashboardContract.js`. "Backend" = the developer's endpoint returns it (code reviewed, and confirmed live through the ngrok backend before the move to Azure; `/category-budget-picks` is code-reviewed only). Every row still needs re-checking on Azure once open item 1 is fixed.
+The dashboard reads these exact names. The full shapes are in `dashboardContract.js`. "Backend" = the developer's endpoint returns it (code reviewed, and confirmed live through the ngrok backend before the move to Azure; `/category-budget-picks` is code-reviewed only). The Azure backend is now live behind the login (open item 1), so each row should be re-checked there after signing in.
 
 | Endpoint | Fields the dashboard reads | Backend |
 |---|---|---|
@@ -847,4 +847,25 @@ Unchanged. See "Open items for the backend" at the top of this file; item 1 (the
 
 **Mock-only items**
 None any more. The "Mock-only items" notes in older entries describe the removed sample data.
+
+---
+
+### Change 12 — Overview: "Total Delivered" card
+
+**What changed and why**
+A **Total Delivered** card was added to the Overview's top row, between "Messages Sent" and "Delivery Rate". It shows how many messages reached customers, with "of N sent" underneath. Like the other cards it follows the path tabs and the Today / 7 Days / 30 Days range. The row now holds 5 cards on wide screens (the existing `kpi-grid five` layout, also used on Conversations) and wraps 2 per row on phones. Nothing else on the page changed.
+
+**Files touched**
+- `src/pages/Overview.jsx`: `kpi-grid` → `kpi-grid five`; one new `MetricCard`
+
+Lint and build pass. Checked at desktop, mid and phone widths.
+
+**New data fields / service methods**
+None. The card reads `messagesDelivered` and `messagesSent` from `GET /metric-cards`, which the dashboard already loads (the Delivery Rate card already showed `messagesDelivered` in its small text).
+
+**Contract update**
+None. `messagesDelivered` is already documented for `/metric-cards` in `dashboardContract.js` and in the field checklist above.
+
+**Real data mapping**
+`messagesDelivered` = messages with a "delivered" status from Karix in the selected range and path, as counted by the backend.
 

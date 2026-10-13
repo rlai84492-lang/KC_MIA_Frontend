@@ -83,8 +83,9 @@ export default function Overview() {
 
   // KPI cards
   const kpis = (
-    <div className="kpi-grid">
+    <div className="kpi-grid five">
       <MetricCard icon="📨" value={fmt(m.messagesSent)} label="Messages Sent" detail={`${rangeLabel} · ${fmt(m.messagesPerDay)} per day`} />
+      <MetricCard icon="📩" value={fmt(m.messagesDelivered)} label="Total Delivered" detail={`of ${fmt(m.messagesSent)} sent`} />
       <MetricCard icon="📬" value={percent(m.deliveryRate)} label="Delivery Rate" detail={`${fmt(m.messagesDelivered)} delivered · ${fmt(m.messagesFailed)} failed`} />
       <MetricCard icon="📖" value={percent(m.openRate)} label="Open Rate" detail={`${fmt(m.readReceipts)} read receipts`} />
       <MetricCard icon="👆" value={percent(m.clickRate)} label="Click Rate" detail={`${fmt(m.openerTaps)} opener taps${all ? "" : ` · ${pathInfo.shortLabel}`}`} />
