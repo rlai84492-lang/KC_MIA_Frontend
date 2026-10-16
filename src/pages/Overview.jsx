@@ -60,10 +60,15 @@ export default function Overview() {
 
       // Outcome tiles, drop-off and the category / budget panels are only on this page, so they load here:
   // GET /outcomes, GET /flow-dropoff and GET /category-budget-picks.
+  // The 5 metric cards always show All paths (GET /metric-cards with flow=all), whichever path tab is selected.
   const params = { from: filters.from, to: filters.to, flow: filters.path };
   const { data: page, error: pageError } = useDashboardQuery(
-    () => Promise.all([service.getOutcomes(params), service.getFlowDropoff(params), service.getCategoryBudgetPicks(params)])
-      .then(([outcomes, flowDropoff, categoryBudgetPicks]) => ({ outcomes, flowDropoff, categoryBudgetPicks })),
+    () => Promise.all([
+      service.getOutcomes(params),
+      service.getFlowDropoff(params),
+      service.getCategoryBudgetPicks(params),
+      service.getMetricCards({ from: filters.from, to: filters.to, flow: "all" })
+    ]).then(([outcomes, flowDropoff, categoryBudgetPicks, metricCards]) => ({ outcomes, flowDropoff, categoryBudgetPicks, metricCards })),
     [service, filters.from, filters.to, filters.path]
   );
 
@@ -76,7 +81,7 @@ export default function Overview() {
   const all = path === "all";
   const has = (p) => all || path === p;
   const pathInfo = PATH_BY_ID[path];
-  const m = summary.metricCards; // GET /metric-cards
+  const m = page.metricCards; // GET /metric-cards, always All paths
   const o = page.outcomes; // GET /outcomes
   const trend = (outcome) => (outcome.trend || []).map((d) => ({ label: dayLabel(d.date), value: d.count }));
   const rangeLabel = RANGE_LABELS[filters.range] || "Selected range";
@@ -88,7 +93,7 @@ export default function Overview() {
       <MetricCard icon="📩" value={fmt(m.messagesDelivered)} label="Total Delivered" detail={`of ${fmt(m.messagesSent)} sent`} />
       <MetricCard icon="📬" value={percent(m.deliveryRate)} label="Delivery Rate" detail={`${fmt(m.messagesDelivered)} delivered · ${fmt(m.messagesFailed)} failed`} />
       <MetricCard icon="📖" value={percent(m.openRate)} label="Open Rate" detail={`${fmt(m.readReceipts)} read receipts`} />
-      <MetricCard icon="👆" value={percent(m.clickRate)} label="Click Rate" detail={`${fmt(m.openerTaps)} opener taps${all ? "" : ` · ${pathInfo.shortLabel}`}`} />
+      <MetricCard icon="👆" value={percent(m.clickRate)} label="Click Rate" detail={`${fmt(m.openerTaps)} opener taps`} />
     </div>
   );
 

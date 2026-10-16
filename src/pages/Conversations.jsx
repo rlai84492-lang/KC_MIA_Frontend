@@ -103,8 +103,11 @@ export default function Conversations() {
 
   return (
     <>
-      <div className="kpi-grid five">
-        <MetricCard icon="💬" value={fmt(cards.totalSessions)} label="Total Sessions" detail="Sessions started in range" />
+      {/* "Total Conversation" shows on All paths only; on a single path the row has 4 cards. */}
+      <div className={filters.path === "all" ? "kpi-grid five" : "kpi-grid"}>
+        {filters.path === "all" && (
+          <MetricCard icon="💬" value={fmt(cards.totalSessions)} label="Total Conversation" detail="Conversations started in range" />
+        )}
         <MetricCard icon="🗂" value={fmt(cards.enteredDiscovery)} label="Entered Discovery" detail="Picked a category" />
         <MetricCard icon="🎠" value={fmt(cards.carouselReached)} label="Carousel Reached" detail="Saw the product cards" />
         <MetricCard icon="💌" value={filters.path === "all" || filters.path === "celebrating" ? fmt(cards.isharaSent) : "–"} label="Ishara Sent" detail="Celebrating path" />
