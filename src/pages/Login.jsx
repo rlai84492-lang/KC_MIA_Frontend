@@ -179,7 +179,7 @@ export default function Login({ onLoggedIn }) {
                   <div className="kcl-chalni-center" />
                 </div>
               </div>
-              <h1 className="kcl-brand">Tanishq</h1>
+              <h1 className="kcl-brand">Mia by Tanishq</h1>
               <div className="kcl-festival-pill">
                 <span className="kcl-pill-dot" aria-hidden="true" />
                 Karwa Chauth 2026

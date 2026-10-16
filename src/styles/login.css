@@ -377,10 +377,11 @@
 .kcl-brand {
   margin: 0;
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 32px;
+  font-size: 27px;
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 8px;
+  letter-spacing: 5px;
+  white-space: nowrap;
   text-transform: uppercase;
   color: #f5c842;
   text-shadow: 0 0 40px rgba(245, 200, 66, 0.3);
@@ -748,9 +749,10 @@
   }
 
   .kcl-brand {
-    font-size: 28px;
-    letter-spacing: 6px;
+    font-size: 21px;
+    letter-spacing: 3px;
   }
+
 
   .kcl-moon-scene {
     right: 8px;
