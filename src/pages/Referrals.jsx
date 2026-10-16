@@ -29,6 +29,8 @@ export default function Referrals() {
   const toast = useToast();
   const [show, setShow] = useState("all");
   const [copying, setCopying] = useState(false);
+  const [fullNumbers, setFullNumbers] = useState(false);
+
 
   // Any filter change goes back to page 1.
   const filterKey = [filters.from, filters.to, show].join("|");
@@ -59,12 +61,12 @@ export default function Referrals() {
     setCopying(true);
     try {
       // GET /referral-leads/export?scope=all → { columns, rows }: each row is keyed by its column header.
-      // The Status column isn't used on this page, and mobiles stay masked like on screen
-      // (only Cohorts downloads can include full numbers).
+      // The Status column isn't used on this page. Mobiles are masked unless
+      // "Full mobile numbers in downloads" is ticked.
       const result = await service.exportReferralLeads({ ...params, show, scope: "all" });
       const columns = result.columns.filter((header) => header !== "Status").map((header) => ({
         header,
-        value: (row) => (header === "Mobile" ? maskPhone(row[header]) : row[header])
+        value: (row) => (header === "Mobile" && !fullNumbers ? maskPhone(row[header]) : row[header])
       }));
       const filename = `mia-kc26-referral-leads-${(RANGE_LABELS[filters.range] || "custom").toLowerCase().replace(/\s+/g, "")}.csv`;
       downloadCsv(filename, toCsv(columns, result.rows));
@@ -98,6 +100,10 @@ export default function Referrals() {
             ))}
           </div>
           <span className="flex-1" />
+          <label className="opts">
+            <input type="checkbox" checked={fullNumbers} onChange={(e) => setFullNumbers(e.target.checked)} />
+            Full mobile numbers in downloads
+          </label>
           <button type="button" className="btn" onClick={copyCsv} disabled={copying || !data.totalElements}>
             <Download size={16} aria-hidden="true" />Download as CSV
           </button>

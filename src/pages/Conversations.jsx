@@ -37,7 +37,9 @@ export default function Conversations() {
   const [flowStep, setFlowStep] = useState("all");
   const [sortChoice, setSort] = useState(DEFAULT_SORT);
   const [copying, setCopying] = useState(false);
+  const [fullNumbers, setFullNumbers] = useState(false);
   const q = useDebounced(query.trim(), 250);
+
 
   // "I'm celebrating" has no budget step (flow script v7), so its view has no Budget column.
   const sort = filters.path === "celebrating" && sortChoice.key === "budget" ? DEFAULT_SORT : sortChoice;
@@ -83,11 +85,12 @@ export default function Conversations() {
     try {
       // GET /conversations/export?scope=all → { columns, rows }: each row is keyed by its column header.
       const result = await service.exportConversations({ ...params, scope: "all" });
-      // Phones stay masked in this download, like on screen (only Cohorts downloads can include full numbers).
+      // Phones are masked in this download unless "Full mobile numbers in downloads" is ticked.
       const columns = result.columns.map((header) => ({
         header,
-        value: (row) => (header === "Phone" ? maskPhone(row[header]) : row[header])
+        value: (row) => (header === "Phone" && !fullNumbers ? maskPhone(row[header]) : row[header])
       }));
+
       const filename = `mia-kc26-conversations-${(RANGE_LABELS[filters.range] || "custom").toLowerCase().replace(/\s+/g, "")}.csv`;
       downloadCsv(filename, toCsv(columns, result.rows));
       toast(`Downloaded ${fmt(result.rows.length)} rows · ${filename}`);
@@ -143,6 +146,10 @@ export default function Conversations() {
           </div>
 
           <span className="flex-1" />
+          <label className="opts">
+            <input type="checkbox" checked={fullNumbers} onChange={(e) => setFullNumbers(e.target.checked)} />
+            Full mobile numbers in downloads
+          </label>
           <button type="button" className="btn" onClick={copyCsv} disabled={copying || !data.totalElements}>
             <Download size={16} aria-hidden="true" />Download as CSV ({fmt(data.totalElements)})
           </button>
