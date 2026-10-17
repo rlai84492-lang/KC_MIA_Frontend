@@ -57,6 +57,7 @@ export default function StoreVisits() {
                 <th>Slot</th>
                 <th>Reserved</th>
                 <th>Ref</th>
+                <th>Store Code</th>
               </tr>
             </thead>
             <tbody>
@@ -68,6 +69,7 @@ export default function StoreVisits() {
                   <td className="mono">{v.slotLabel}</td>
                   <td>{v.reservedLabel || <span className="text-kc-ink3">—</span>}</td>
                   <td className="mono">{v.bookingRef}</td>
+                  <td className="mono">{v.storeCode}</td>
                 </tr>
               ))}
               {!data.rows.length && (
