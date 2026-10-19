@@ -32,6 +32,7 @@ export const DASHBOARD_ENDPOINTS = {
   referralLeadsSummary: "/api/dashboard/referral-leads/summary",
   referralLeads: "/api/dashboard/referral-leads",
   referralLeadsExport: "/api/dashboard/referral-leads/export",
+    retargetTemplates: "/api/dashboard/retarget-templates",
 
   // Cohorts
   cohortsSummary: "/api/dashboard/cohorts/summary",
@@ -45,7 +46,8 @@ export const DASHBOARD_ENDPOINTS = {
     "store-visit-booked": "/api/dashboard/cohorts/store-visit-booked",
     "clicked-buy-online": "/api/dashboard/cohorts/clicked-buy-online",
     "referred-consent-given": "/api/dashboard/cohorts/referred-consent-given",
-    "opted-in-new-arrivals": "/api/dashboard/cohorts/opted-in-new-arrivals"
+    "opted-in-new-arrivals": "/api/dashboard/cohorts/opted-in-new-arrivals",
+    
   }
 };
 

@@ -171,6 +171,7 @@ export const apiDashboardProvider = {
   getActivity: get(DASHBOARD_ENDPOINTS.activity),
   getPaths: get(DASHBOARD_ENDPOINTS.paths),
   getCategoryBudgetPicks: get(DASHBOARD_ENDPOINTS.categoryBudgetPicks),
+    getRetargetTemplates: get(DASHBOARD_ENDPOINTS.retargetTemplates),
 
   // Conversations
   getConversationsSummary: get(DASHBOARD_ENDPOINTS.conversationsSummary),

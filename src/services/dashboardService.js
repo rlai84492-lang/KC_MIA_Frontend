@@ -15,6 +15,7 @@ export const dashboardService = {
   getActivity: (params = {}) => provider.getActivity(params),
   getPaths: (params = {}) => provider.getPaths(params),
   getCategoryBudgetPicks: (params = {}) => provider.getCategoryBudgetPicks(params),
+    getRetargetTemplates: (params = {}) => provider.getRetargetTemplates(params),
 
   // Conversations
   getConversationsSummary: (params = {}) => provider.getConversationsSummary(params),
