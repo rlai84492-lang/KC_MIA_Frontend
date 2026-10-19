@@ -39,6 +39,7 @@ export const DASHBOARD_ENDPOINTS = {
   // One download endpoint per card. Each key is the backend's segment `key` (from /cohorts/summary).
   cohortSegments: {
     "other-engaged": "/api/dashboard/cohorts/other-engaged",
+    "stopped-at-opener": "/api/dashboard/cohorts/stopped-at-opener",
     "hint-sent-no-visit": "/api/dashboard/cohorts/hint-sent-no-visit",
     "list-started-no-hint": "/api/dashboard/cohorts/list-started-no-hint",
     "browsing-no-purchase": "/api/dashboard/cohorts/browsing-no-purchase",

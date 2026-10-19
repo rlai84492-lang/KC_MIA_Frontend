@@ -41,7 +41,7 @@ function SegmentCard({ card, busy, onDownload }) {
       {text.useFor && <div className="segcard-use"><b>Use it for</b> · {text.useFor.join(" · ")}</div>}
       <div className="segcard-acts">
         <button type="button" className="btn sm" disabled={!card.count || busy} onClick={onDownload}>
-          <Download size={15} aria-hidden="true" />{card.placeholder ? "Coming soon" : "Download CSV"}
+          <Download size={15} aria-hidden="true" />Download CSV
         </button>
       </div>
     </div>
@@ -75,6 +75,19 @@ export default function Audiences() {
     label: "Other engaged, not finished",
     flows: PATHS.map((p) => p.id),
     priority: 4,
+    count: null,
+    placeholder: true
+  };
+
+  // "Distinct Opener": the backend's "stopped-at-opener" card, always shown last and named "Distinct Opener".
+  // Until the backend sends it, a placeholder with no number ("—") and no download.
+  const openerCard = stopped.segments.find((card) => card.key === "stopped-at-opener");
+  const distinctOpenerCard = openerCard ? { ...openerCard, label: "Distinct Opener" } : {
+    key: "stopped-at-opener",
+    label: "Distinct Opener",
+
+    flows: PATHS.map((p) => p.id),
+    priority: null,
     count: null,
     placeholder: true
   };
@@ -127,9 +140,9 @@ export default function Audiences() {
           Full mobile numbers in downloads
         </label>
       </div>
-            {/* "Other engaged, not finished" always comes first; the other cards keep the backend's order. */}
+      {/* "Other engaged, not finished" always comes first; the other cards keep the backend's order. */}
       <div className="segcards">
-      {[engagedCard, ...stopped.segments.filter((card) => card.key !== "other-engaged")].map(segmentCard)}
+      {[engagedCard, ...stopped.segments.filter((card) => card.key !== "other-engaged" && card.key !== "stopped-at-opener"), distinctOpenerCard].map(segmentCard)}
 
       </div>
 
