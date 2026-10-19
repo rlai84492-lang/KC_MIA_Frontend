@@ -167,7 +167,7 @@ export default function Conversations() {
                 <SortHeader label="Path" sortKey="path" sort={sort} onSort={onSort} />
                 <SortHeader label="Step" sortKey="step" sort={sort} onSort={onSort} />
                 <SortHeader label="Category" sortKey="category" sort={sort} onSort={onSort} />
-                <SortHeader label="Product" sortKey="product" sort={sort} onSort={onSort} />
+                <th>Products Chosen</th>
                 {showBudget && <SortHeader label="Budget" sortKey="budget" sort={sort} onSort={onSort} />}
                 <SortHeader label="Last Activity" sortKey="lastActivity" sort={sort} onSort={onSort} />
               </tr>
@@ -180,7 +180,7 @@ export default function Conversations() {
                   <td><PathPill path={row.flow} /></td>
                   <td><span className={`pill ${stepDef(row.flow, row.stepCode)?.tone || "p-mute"}`}>{row.stepLabel}</span></td>
                   <td>{row.categoryLabel || <span className="text-kc-ink3">—</span>}</td>
-                  <td>{row.productLabel || <span className="text-kc-ink3">—</span>}</td>
+                  <td>{row.productsChosen || <span className="text-kc-ink3">—</span>}</td>
                   {showBudget && <td className="whitespace-nowrap">{row.budgetLabel || <span className="text-kc-ink3">—</span>}</td>}
                   <td className="mono" title={istDateTime(asIst(row.lastActivity))}>{agoMinutes(row.minutesAgo)}</td>
                 </tr>

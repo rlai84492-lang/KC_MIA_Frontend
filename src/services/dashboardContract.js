@@ -141,13 +141,13 @@ export const FLOW_STEP_CODES = {
  *             (CATEGORY_CODES in campaignConfig.js); left out = all categories
  *   step      a step code, e.g. "1B"; left out = all steps
  *   sort      customer | phone | path | step | category | budget | lastActivity;  direction  asc | desc
- *   row: { sessionId, customerName, phone (masked), flow, pathLabel, stepCode, stepLabel, status, category,
- *          categoryLabel, budget, budgetLabel, startedAt, lastActivity, minutesAgo }
+*   row: { sessionId, customerName, phone (masked), flow, pathLabel, stepCode, stepLabel, status, category,
+ *          categoryLabel, productsChosen (null when nothing chosen), budget, budgetLabel, startedAt, lastActivity, minutesAgo }
  *   showBudget = false on "celebrating": the budget fields are then left out of the rows.
  *
  * GET /conversations/export (same filters + scope=all) →
  *   { columns, rows, scope, page, totalElements, totalPages, exportedRows, flow, range }
- *   columns: Customer, Phone, Path, Step, Status, Category, Budget (not on celebrating), Started At, Last Activity.
+ *   columns: Customer, Phone, Path, Step, Status, Category, Products Chosen, Budget (not on celebrating), Started At, Last Activity.
  *   Each row is keyed by its column header. Phone is the full number; the dashboard masks it in the CSV.
  */
 
