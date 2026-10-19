@@ -80,6 +80,9 @@ export function stepDef(path, code) {
 // names and copy live here. "journey" segments are exclusive by `priority` (1 wins);
 // "done" segments can overlap.
 export const AUDIENCE_SEGMENTS = [
+  { id: "other-engaged", group: "journey", priority: 4, name: "Other engaged, not finished", paths: ["celebrating", "shopping", "sparkle"], stage: "Any step",
+    definition: "Tapped an opener button (Celebrating, Shopping for her or Sparkle) but didn't interact any further, excluding users in the following categories: Hint Sent but No Visit, List Started but No Hint Sent, Browsing for Her, and Shortlisted for Herself but No Purchase.",
+    nextStep: "Re-open the journey where they stopped", useFor: ["WhatsApp nudge", "Re-engagement audience"] },
   { id: "hint-sent-no-visit", group: "journey", priority: 1, name: "Hint sent, no visit yet", paths: ["celebrating"], stage: "Ishara Sent",
     definition: "Sent her Ishara to her husband, but no store visit booked and no purchase recorded.",
     nextStep: "Re-share the Ishara (Step 1G) · optional visit (C2)", useFor: ["WhatsApp nudge", "Husband remarketing", "Store follow-up"] },

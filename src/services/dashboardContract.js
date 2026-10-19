@@ -37,6 +37,7 @@ export const DASHBOARD_ENDPOINTS = {
   cohortsSummary: "/api/dashboard/cohorts/summary",
   // One download endpoint per card. Each key is the backend's segment `key` (from /cohorts/summary).
   cohortSegments: {
+    "other-engaged": "/api/dashboard/cohorts/other-engaged",
     "hint-sent-no-visit": "/api/dashboard/cohorts/hint-sent-no-visit",
     "list-started-no-hint": "/api/dashboard/cohorts/list-started-no-hint",
     "browsing-no-purchase": "/api/dashboard/cohorts/browsing-no-purchase",
@@ -187,6 +188,8 @@ export const FLOW_STEP_CODES = {
  *   { engagedNotFinished, completedOrOptedIn,
  *     whereTheyStopped: { total, segments }, completedOrOptedInSegments: { total, segments }, range }
  *   segment card: { key, label, flows, priority, count }   (priority is null on "Completed or opted in")
+ *   whereTheyStopped has 5 cards: other-engaged (shown first on the page; everyone engaged who isn't in
+ *   the other four or finished), hint-sent-no-visit, list-started-no-hint, browsing-no-purchase, shortlisted-no-visit.
  *   The card text (definition, next step, use it for) is in campaignConfig.js → AUDIENCE_SEGMENTS, by `key`.
  *
  * GET /cohorts/<key> (from, to, fullMobile) →

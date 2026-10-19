@@ -13,7 +13,7 @@ import { downloadCsv, toCsv } from "../utils/csv";
 // Cohorts always cover every path (the top toggle only offers "All paths" here).
 // The card text (definition, next step, use it for) comes from campaignConfig, matched by the backend's card `key`.
 const SEG_BY_ID = Object.fromEntries(AUDIENCE_SEGMENTS.map((g) => [g.id, g]));
-const PRIORITY_STRIP = ["Hint sent, no visit", "List started, no hint", "Browsing / shortlisted, no purchase"];
+const PRIORITY_STRIP = ["Hint sent, no visit", "List started, no hint", "Browsing / shortlisted, no purchase", "Other engaged"];
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -30,7 +30,7 @@ function SegmentCard({ card, busy, onDownload }) {
     <div className="segcard">
       <div className="segcard-head">
         <div className="segcard-name">{card.label}</div>
-        <div className="segcard-count">{fmt(card.count)}</div>
+        <div className="segcard-count">{card.placeholder ? "—" : fmt(card.count)}</div>
       </div>
       {text.definition && <div className="segcard-def">{text.definition}</div>}
       <div className="segcard-meta">
@@ -41,7 +41,7 @@ function SegmentCard({ card, busy, onDownload }) {
       {text.useFor && <div className="segcard-use"><b>Use it for</b> · {text.useFor.join(" · ")}</div>}
       <div className="segcard-acts">
         <button type="button" className="btn sm" disabled={!card.count || busy} onClick={onDownload}>
-          <Download size={15} aria-hidden="true" />Download CSV
+          <Download size={15} aria-hidden="true" />{card.placeholder ? "Coming soon" : "Download CSV"}
         </button>
       </div>
     </div>
@@ -67,6 +67,18 @@ export default function Audiences() {
 
   const stopped = data.whereTheyStopped;
   const completed = data.completedOrOptedInSegments;
+
+  // "Other engaged, not finished": the backend's card when it sends one; until then a placeholder
+  // with no number ("—") and no download ("Coming soon").
+  const engagedCard = stopped.segments.find((card) => card.key === "other-engaged") || {
+    key: "other-engaged",
+    label: "Other engaged, not finished",
+    flows: PATHS.map((p) => p.id),
+    priority: 4,
+    count: null,
+    placeholder: true
+  };
+
 
   // GET /cohorts/<key>?fullMobile=… → { columns, rows }: each row is keyed by its column header.
   // The backend masks the mobiles unless the "Full mobile numbers in downloads" box is ticked.
@@ -115,7 +127,11 @@ export default function Audiences() {
           Full mobile numbers in downloads
         </label>
       </div>
-      <div className="segcards">{stopped.segments.map(segmentCard)}</div>
+            {/* "Other engaged, not finished" always comes first; the other cards keep the backend's order. */}
+      <div className="segcards">
+      {[engagedCard, ...stopped.segments.filter((card) => card.key !== "other-engaged")].map(segmentCard)}
+
+      </div>
 
       <div className="sechead">
         <h2>Completed or opted in</h2>
